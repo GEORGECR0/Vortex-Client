@@ -1,0 +1,192 @@
+:root {
+    --bg-color: #0A0C10;
+    --glass-bg: rgba(10, 12, 16, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.07);
+    --text-color-primary: rgba(255, 255, 255, 0.8);
+    --text-color-secondary: rgba(255, 255, 255, 0.35);
+    --accent-color: rgb(110, 40, 40);
+    --accent-glow: rgba(110, 40, 40, 0.8);
+    --hover-bg: rgba(255, 255, 255, 0.05);
+    --hover-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color-primary);
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.glass-container {
+    backdrop-filter: blur(0.45rem);
+    background-color: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.35s ease;
+}
+
+/* Hero Section */
+.hero-section {
+    min-height: 550px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-content h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    color: var(--text-color-secondary);
+    margin-bottom: 2rem;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.35s ease;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--accent-glow);
+    color: white;
+    border: 1px solid var(--hover-border);
+    box-shadow: 0 0 15px 0 var(--accent-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-color);
+    box-shadow: 0 0 20px 0 var(--accent-color);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--text-color-secondary);
+    border: 1px solid var(--glass-border);
+}
+
+.btn-secondary:hover {
+    background-color: var(--hover-bg);
+    color: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--hover-border);
+}
+
+/* Features Section */
+.features-section h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.feature-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.feature-card i {
+    font-size: 3rem;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+    color: var(--text-color-secondary);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Installation Section */
+.install-section {
+    text-align: center;
+    padding: 3rem;
+}
+
+.install-section h2 {
+    margin-bottom: 2rem;
+}
+
+.steps-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.step-card {
+    width: 300px;
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.step-card h3 {
+    margin-bottom: 0.5rem;
+}
+
+.step-card p a {
+    color: var(--text-color-primary);
+    text-decoration: underline;
+}
+
+.install-btn {
+    margin-top: 1rem;
+}
