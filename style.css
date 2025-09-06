@@ -1,13 +1,13 @@
 :root {
     --bg-color: #0A0C10;
-    --glass-bg: rgba(10, 12, 16, 0.6);
+    --glass-bg: rgba(16, 18, 27, 0.4);
     --glass-border: rgba(255, 255, 255, 0.07);
-    --text-color-primary: rgba(255, 255, 255, 0.8);
-    --text-color-secondary: rgba(255, 255, 255, 0.35);
+    --text-color-primary: rgba(255, 255, 255, 0.9);
+    --text-color-secondary: rgba(255, 255, 255, 0.5);
     --accent-color: rgb(110, 40, 40);
     --accent-glow: rgba(110, 40, 40, 0.8);
     --hover-bg: rgba(255, 255, 255, 0.05);
-    --hover-border: rgba(255, 255, 255, 0.1);
+    --hover-border: rgba(255, 255, 255, 0.2);
 }
 
 * {
@@ -18,6 +18,7 @@
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: 100px;
 }
 
 body {
@@ -25,196 +26,207 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color-primary);
     line-height: 1.6;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 2rem;
 }
 
-.main-container {
+/* NEW: This class centers the content */
+.content-wrapper {
     width: 100%;
-    max-width: 1200px;
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
 }
 
 .glass-container {
-    backdrop-filter: blur(0.45rem);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     background-color: var(--glass-bg);
     border: 1px solid var(--glass-border);
-    border-radius: 1rem;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.35s ease;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
-/* Hero Section */
-.hero-section {
-    min-height: 550px;
+/* --- Header & Navigation --- */
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.nav-wrapper {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    text-align: center;
+    height: 80px;
 }
 
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.logo-img { height: 40px; }
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color-primary);
+    text-decoration: none;
+}
+
+.main-nav { display: flex; align-items: center; gap: 1.5rem; }
+.main-nav a {
+    color: var(--text-color-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+.main-nav a:not(.btn):hover { color: var(--text-color-primary); }
+
+/* --- Main Content Sections --- */
+main {
+    padding-top: 80px; /* Space for the fixed header */
+}
+
+/* This applies background styles to full-width sections */
+.glass-section {
+    background-image: radial-gradient(circle at top, rgba(110, 40, 40, 0.15), transparent 50%);
+    padding: 5rem 0;
+}
+
+#features {
+    padding: 5rem 0;
+}
+
+.hero-section {
+    text-align: center;
+    min-height: 500px;
+    display: grid;
+    place-items: center;
+}
 .hero-content h1 {
-    font-size: 4rem;
+    font-size: 3.5rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
+    text-shadow: 0 0 20px var(--accent-glow);
 }
-
 .hero-content p {
     font-size: 1.2rem;
     color: var(--text-color-secondary);
-    margin-bottom: 2rem;
+    max-width: 600px;
+    margin: 0 auto 2rem;
 }
 
-.hero-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-/* Buttons */
-.btn {
-    display: inline-block;
-    padding: 1rem 2.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.35s ease;
-    border: none;
-}
-
-.btn-primary {
-    background-color: var(--accent-glow);
-    color: white;
-    border: 1px solid var(--hover-border);
-    box-shadow: 0 0 15px 0 var(--accent-color);
-}
-
-.btn-primary:hover {
-    background-color: var(--accent-color);
-    box-shadow: 0 0 20px 0 var(--accent-color);
-}
-
-.btn-secondary {
-    background-color: transparent;
-    color: var(--text-color-secondary);
-    border: 1px solid var(--glass-border);
-}
-
-.btn-secondary:hover {
-    background-color: var(--hover-bg);
-    color: rgba(255, 255, 255, 0.6);
-    border: 1px solid var(--hover-border);
-}
-
-/* Features Section */
-.features-section h2 {
+/* --- Features & Cards --- */
+.features-section h2, .install-section h2 {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
+    font-size: 2.2rem;
 }
 
-/* Updated features-grid styling */
 .features-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
-}
-
-/* New feature category and card styles */
-.feature-category {
-    flex: 1 1 300px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.feature-category h3 {
-    text-align: center;
-    font-size: 1.75rem;
-    margin-bottom: 0.5rem;
-    color: var(--text-color-primary);
-}
-
-.feature-category i {
-    color: var(--accent-color);
-    margin-right: 8px;
 }
 
 .feature-card {
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-    align-items: flex-start;
-    border: 1px solid var(--glass-border);
-    background-color: var(--glass-bg);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
 }
-
+.feature-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--hover-border);
+    background-color: var(--hover-bg);
+    box-shadow: 0 0 15px 0 rgba(110, 40, 40, 0.2);
+}
 .feature-card h4 {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: 600;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
-
-.feature-card p {
-    font-size: 0.9rem;
-    color: var(--text-color-secondary);
-}
+.feature-card i { color: var(--accent-color); }
+.feature-card p { font-size: 0.95rem; color: var(--text-color-secondary); }
 
 .badge {
-    font-size: 0.8rem;
-    font-weight: bold;
+    font-size: 0.75rem;
+    font-weight: 600;
     color: var(--text-color-primary);
     background-color: var(--accent-glow);
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: 6px;
     text-transform: uppercase;
+    margin-left: auto;
 }
 
-/* Installation Section */
-.install-section {
-    text-align: center;
-    padding: 3rem;
-}
+/* --- Installation Steps --- */
+.install-section { text-align: center; }
 
-.install-section h2 {
-    margin-bottom: 2rem;
-}
-
-.steps-grid {
+.steps-container {
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
     gap: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
 }
 
 .step-card {
-    width: 300px;
-    text-align: center;
-    padding: 1.5rem;
+    flex: 1;
+    min-width: 280px;
+    max-width: 320px;
+    padding: 2rem 1.5rem;
+    transition: transform 0.3s ease;
 }
+.step-card:hover { transform: translateY(-5px); }
 
-.step-card h3 {
-    margin-bottom: 0.5rem;
+.step-number {
+    width: 40px; height: 40px;
+    background-color: var(--accent-color);
+    color: white; border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 1.2rem; font-weight: 700;
+    margin: 0 auto 1rem;
 }
+.step-card h3 { margin-bottom: 0.5rem; }
+.step-card p a { color: var(--accent-color); font-weight: 600; text-decoration: none; }
+.step-card p a:hover { text-decoration: underline; }
 
-.step-card p a {
+/* --- Buttons & Footer --- */
+.btn {
+    display: inline-block; padding: 0.8rem 2rem;
+    font-size: 1rem; font-weight: 600;
+    text-decoration: none; border-radius: 8px;
+    cursor: pointer; transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+.btn-primary {
+    background-color: var(--accent-color);
+    color: white; box-shadow: 0 0 15px 0 var(--accent-glow);
+}
+.btn-primary:hover {
+    background-color: var(--accent-glow);
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px 0 var(--accent-glow);
+}
+.btn-secondary {
+    background-color: var(--glass-bg);
     color: var(--text-color-primary);
-    text-decoration: underline;
+    border: 1px solid var(--glass-border);
 }
+.btn-secondary:hover { background-color: var(--hover-bg); border-color: var(--hover-border); }
+.install-btn { margin-top: 1rem; }
 
-.install-btn {
-    margin-top: 1rem;
+.footer {
+    padding: 2rem 0;
+    background-color: #06080c;
+    border-top: 1px solid var(--glass-border);
+    text-align: center;
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
 }
