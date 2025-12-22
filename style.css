@@ -1,0 +1,307 @@
+:root {
+    --bg-color: #0A0C10;
+    --glass-bg: rgba(16, 18, 27, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.07);
+    --text-color-primary: rgba(255, 255, 255, 0.9);
+    --text-color-secondary: rgba(255, 255, 255, 0.5);
+    --accent-color: rgb(110, 40, 40);
+    --accent-glow: rgba(110, 40, 40, 0.8);
+    --hover-bg: rgba(255, 255, 255, 0.05);
+    --hover-border: rgba(255, 255, 255, 0.2);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color-primary);
+    line-height: 1.6;
+}
+
+.content-wrapper {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.glass-container {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background-color: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.nav-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.logo-img { height: 40px; }
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color-primary);
+    text-decoration: none;
+}
+
+.main-nav { display: flex; align-items: center; gap: 1.5rem; }
+.main-nav a {
+    color: var(--text-color-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+.main-nav a:not(.btn):hover { color: var(--text-color-primary); }
+
+main {
+    padding-top: 80px;
+}
+
+.glass-section {
+    background-image: radial-gradient(circle at top, rgba(110, 40, 40, 0.15), transparent 50%);
+    padding: 5rem 0;
+}
+
+#features {
+    padding: 5rem 0;
+}
+
+.hero-section {
+    text-align: center;
+    min-height: 500px;
+    display: grid;
+    place-items: center;
+}
+.hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 20px var(--accent-glow);
+}
+.hero-content p {
+    font-size: 1.2rem;
+    color: var(--text-color-secondary);
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+
+.features-section h2, .install-section h2 {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 2.2rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.feature-card {
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+.feature-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--hover-border);
+    background-color: var(--hover-bg);
+    box-shadow: 0 0 15px 0 rgba(110, 40, 40, 0.2);
+}
+.feature-card h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.feature-card i { color: var(--accent-color); }
+.feature-card p { font-size: 0.95rem; color: var(--text-color-secondary); }
+
+.badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-color-primary);
+    background-color: var(--accent-glow);
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    margin-left: auto;
+}
+
+.install-section {
+     text-align: center;
+     padding: 5rem 0;
+     }
+
+.steps-container {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.step-card {
+    flex: 1;
+    min-width: 280px;
+    max-width: 320px;
+    padding: 2rem 1.5rem;
+    transition: transform 0.3s ease;
+}
+.step-card:hover { transform: translateY(-5px); }
+
+.step-number {
+    width: 40px; height: 40px;
+    background-color: var(--accent-color);
+    color: white; border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 1.2rem; font-weight: 700;
+    margin: 0 auto 1rem;
+}
+.step-card h3 { margin-bottom: 0.5rem; }
+.step-card p a { color: var(--accent-color); font-weight: 600; text-decoration: none; }
+.step-card p a:hover { text-decoration: underline; }
+
+.btn {
+    display: inline-block; padding: 0.8rem 2rem;
+    font-size: 1rem; font-weight: 600;
+    text-decoration: none; border-radius: 8px;
+    cursor: pointer; transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+.btn-primary {
+    background-color: var(--accent-color);
+    color: white; box-shadow: 0 0 15px 0 var(--accent-glow);
+}
+.btn-primary:hover {
+    background-color: var(--accent-glow);
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px 0 var(--accent-glow);
+}
+.btn-secondary {
+    background-color: var(--glass-bg);
+    color: var(--text-color-primary);
+    border: 1px solid var(--glass-border);
+}
+.btn-secondary:hover { background-color: var(--hover-bg); border-color: var(--hover-border); }
+.install-btn { margin-top: 1rem; }
+
+.footer {
+    padding: 2rem 0;
+    background-color: #06080c;
+    border-top: 1px solid var(--glass-border);
+    text-align: center;
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+}
+
+
+
+.screenshots-section {
+    padding: 5rem 0;
+    text-align: center;
+}
+
+.slider {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem;
+    overflow: hidden;
+}
+
+.slides {
+    position: relative;
+}
+
+.slide {
+    width: 100%;
+    display: none;
+    border-radius: 12px;
+}
+
+.slide.active {
+    display: block;
+}
+
+/* Arrows */
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: white;
+    font-size: 1.5rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.arrow:hover {
+    background: var(--hover-bg);
+    border-color: var(--hover-border);
+}
+
+.arrow.left {
+    left: 10px;
+}
+
+.arrow.right {
+    right: 10px;
+}
+
+/* Dots */
+.dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background-color: var(--text-color-secondary);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dot.active {
+    background-color: var(--accent-color);
+}
