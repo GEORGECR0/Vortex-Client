@@ -162,7 +162,6 @@ main {
 
 .install-section {
      text-align: center;
-     padding: 5rem 0;
      }
 
 .steps-container {
@@ -261,8 +260,8 @@ main {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: transparent;
+    border: transparent;
     color: white;
     font-size: 1.5rem;
     padding: 0.5rem 0.8rem;
@@ -272,10 +271,6 @@ main {
     z-index: 10;
 }
 
-.arrow:hover {
-    background: var(--hover-bg);
-    border-color: var(--hover-border);
-}
 
 .arrow.left {
     left: 10px;
