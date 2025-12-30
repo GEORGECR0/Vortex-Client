@@ -110,70 +110,117 @@
 
         document.addEventListener('DOMContentLoaded', () => {
 
-            try {
-                const firebaseConfig = {
-                    apiKey: "AIzaSyDdbd6-EQHUD1uGcRvweIQA0O3QuSUHyW0",
-                    authDomain: "vortex-web-database.firebaseapp.com",
-                    projectId: "vortex-web-database",
-                    storageBucket: "vortex-web-database.appspot.com",
-                    messagingSenderId: "363017626211",
-                    appId: "1:363017626211:web:c7d232d4078614be634e56",
-                    measurementId: "G-H5ZPXB464M"
-                };
+                try {
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyDdbd6-EQHUD1uGcRvweIQA0O3QuSUHyW0",
+                        authDomain: "vortex-web-database.firebaseapp.com",
+                        projectId: "vortex-web-database",
+                        storageBucket: "vortex-web-database.appspot.com",
+                        messagingSenderId: "363017626211",
+                        appId: "1:363017626211:web:c7d232d4078614be634e56",
+                        measurementId: "G-H5ZPXB464M"
+                    };
 
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
-                const installButton = document.getElementById('install-button');
+                    const app = initializeApp(firebaseConfig);
+                    const db = getFirestore(app);
+                    const installButton = document.getElementById('install-button');
 
-                if (!installButton) return;
+                    if (!installButton) return;
 
-                installButton.addEventListener('click', async () => {
-                    const countDocRef = doc(db, "stats", "downloads");
-                    try {
-                        await runTransaction(db, async (transaction) => {
-                            const countDoc = await transaction.get(countDocRef);
-                            if (!countDoc.exists() || typeof countDoc.data().count !== 'number') {
-                                throw new Error("Document is missing or count is not a number.");
-                            }
-                            const newCount = countDoc.data().count + 1;
-                            transaction.update(countDocRef, { count: newCount });
-                        });
-                    } catch (error) {}
-                });
-            } catch (error) {}
+       installButton.addEventListener('click', async () => {
+        const countDocRef = doc(db, "stats", "downloads");
+
+        try {
+            let newCount = 0;
+
+            await runTransaction(db, async (transaction) => {
+                const countDoc = await transaction.get(countDocRef);
+                if (!countDoc.exists()) {
+                    throw new Error("Downloads document missing");
+                }
+
+                newCount = countDoc.data().count + 1;
+                transaction.update(countDocRef, { count: newCount });
+            });
+
+            sendDiscordWebhook(newCount);
+
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+                } catch (error) {}
+            });
+
+            const slides = document.querySelectorAll(".slide");
+        const dotsContainer = document.getElementById("dots");
+        let currentSlide = 0;
+
+        slides.forEach((_, index) => {
+            const dot = document.createElement("div");
+            dot.classList.add("dot");
+            if (index === 0) dot.classList.add("active");
+            dot.addEventListener("click", () => showSlide(index));
+            dotsContainer.appendChild(dot);
         });
 
-        const slides = document.querySelectorAll(".slide");
-    const dotsContainer = document.getElementById("dots");
-    let currentSlide = 0;
+        const dots = document.querySelectorAll(".dot");
 
-    slides.forEach((_, index) => {
-        const dot = document.createElement("div");
-        dot.classList.add("dot");
-        if (index === 0) dot.classList.add("active");
-        dot.addEventListener("click", () => showSlide(index));
-        dotsContainer.appendChild(dot);
-    });
+        function showSlide(index) {
+            slides[currentSlide].classList.remove("active");
+            dots[currentSlide].classList.remove("active");
 
-    const dots = document.querySelectorAll(".dot");
+            currentSlide = index;
 
-    function showSlide(index) {
-        slides[currentSlide].classList.remove("active");
-        dots[currentSlide].classList.remove("active");
+            slides[currentSlide].classList.add("active");
+            dots[currentSlide].classList.add("active");
+        }
 
-        currentSlide = index;
+        document.getElementById("nextBtn").addEventListener("click", () => {
+            showSlide((currentSlide + 1) % slides.length);
+        });
 
-        slides[currentSlide].classList.add("active");
-        dots[currentSlide].classList.add("active");
-    }
+        document.getElementById("prevBtn").addEventListener("click", () => {
+            showSlide((currentSlide - 1 + slides.length) % slides.length);
+        });
 
-    document.getElementById("nextBtn").addEventListener("click", () => {
-        showSlide((currentSlide + 1) % slides.length);
-    });
 
-    document.getElementById("prevBtn").addEventListener("click", () => {
-        showSlide((currentSlide - 1 + slides.length) % slides.length);
-    });
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1455611062983327807/xJ7Xq-L2QlZ6fXl7vp8fsc0_AQiKTEAcFES5fVy_gWSkv4RARo1a5m3ZEnQ3jKCEppO6";
+
+        async function sendDiscordWebhook(downloadCount) {
+            try {
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: "Vortex Client",
+                        embeds: [
+                            {
+                                title: "New Vortex User!",
+                                description: "Someone installed **Vortex Client**!",
+                                color: 0x6E2828,
+                                fields: [
+                                    {
+                                        name: "Install Info",
+                                        value: `Install Count: \`${downloadCount}\`\nTime: \`${new Date().toLocaleString()}\``,
+                                        inline: false
+                                    }
+                                ],
+                                footer: {
+                                    text: "Vortex Client Website"
+                                }
+                            }
+                        ]
+                    })
+                });
+            } catch (err) {
+                console.error("Discord webhook failed:", err);
+            }
+        }
+
     </script>
     </body>
 </html>
