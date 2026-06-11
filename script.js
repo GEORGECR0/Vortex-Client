@@ -83,7 +83,7 @@ function update() {
 setInterval(() => {
   index = (index + 1) % images.length;
   update();
-}, 4000);
+}, 3000);
 
 update();
 
