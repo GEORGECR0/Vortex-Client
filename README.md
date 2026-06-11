@@ -1,1 +1,1 @@
-<img src="./Banner-Image" height="50" width="1200" alt="VORTEX CODIN">
+<img src="./Banner-Image.png" height="50" width="1200" alt="VORTEX CODIN">
