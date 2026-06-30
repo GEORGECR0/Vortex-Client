@@ -1,4 +1,4 @@
-
+// Balright
 document.addEventListener("DOMContentLoaded", () => {
 const downloadBtn = document.querySelector(".btn-cool");
 const downloadSection = document.querySelector(".downloadsection");
@@ -35,6 +35,7 @@ CloseBtns.forEach(btn => {
     btn.addEventListener("click", closeAllSections);
 });
 
+
 document.addEventListener('keydown', e => e.key === 'Escape' && closeAllSections());
 
 
@@ -51,7 +52,6 @@ const images = [
   "assets/images/Image-1.png",
   "assets/images/Image-2.png",
   "assets/images/Image-3.png",
-  "assets/images/Image-4.png",
 ];
 
 
@@ -83,7 +83,7 @@ function update() {
 setInterval(() => {
   index = (index + 1) % images.length;
   update();
-}, 3000);
+}, 4000);
 
 update();
 
