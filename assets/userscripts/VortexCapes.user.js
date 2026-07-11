@@ -2,7 +2,7 @@
 // @name         Vortex Client Capes
 // @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  Vortex Client for Bloxd.io
+// @description  Vortex Capes for Bloxd.io
 // @author       GE0RGECR
 // @match        https://*.bloxd.io/*
 // @icon         https://i.postimg.cc/xT3H10rq/vorte3dmodel.png
