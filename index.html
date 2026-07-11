@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vortex Client</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/images/VortexClientBlack.png">
+    <link rel="stylesheet" href="style.css">
+
+    <meta property="og:title" content="Vortex Client">
+    <meta property="og:description" content="A better way to play Bloxd.">
+    <meta property="og:image" content="https://i.postimg.cc/xT3H10rq/vorte3dmodel.png">
+    <meta property="og:type" content="website">
+
+</head>
+
+<body>
+
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <header class="navbar">
+        <div class="container nav-container no-select">
+            <a href="#" class="Vortex">
+                <img src="assets/images/banner-smaller.png" class="Vortex-icon">
+            </a>
+            <nav class="nav-links">
+                <a href="#cinematics" class="nav-item cinematicsNavBtn">Cinematics</a>
+                <a href="#download" class="nav-item downloadNavBtn">Download</a>
+                <a href="https://discord.gg/NdpwX4FBaB" class="btn_element btn-outline" target="_blank"
+                    rel="noopener noreferrer">
+                    <i class="fab fa-discord" style="margin-right: 8px;"></i> Discord
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="VortexM">
+            <div class="not-ai-my-thugs no-select">
+                *ts is not made by ai
+            </div>
+
+            <div class="container VortexM-layout">
+                <div class="VortexM-text-engine">
+                    <h1 class="main-Vortex-title no-select">
+                        <span>The Ultimate</span>
+                        <span>PvP Architecture For</span>
+                        <em>Bloxd.io</em>
+                    </h1>
+                    <p class="VortexM-desc">
+                        Vortex is a project whose goal is to make Bloxd fun again by providing useful tools and UI
+                        customization , without trying to interfer with Bloxd Ltd.'s vision or goals.
+                    </p>
+                    <div class="VortexM-cta-cluster">
+                        <a href="#download" class="action-btn btn-cool">Download Client</a>
+                    </div>
+                </div>
+                <div class="VortexM-graphic-portal">
+                    <div class="portal-ring ring-outer"></div>
+                    <div class="portal-ring ring-mid"></div>
+                    <div class="portal-ring ring-inner"></div>
+                    <img class="menu-display-image no-select" src="assets/images/menu.png">
+                </div>
+            </div>
+        </section>
+
+        <div id="download" class="downloadsection">
+            <button class="download-close"> ✕ </button>
+            <div class="download-list">
+
+                <div class="download-item">
+
+                    <img src="assets/images/Vortex-Logo (1).png" class="download-icon no-select">
+
+                    <div class="download-info no-select">
+                        <h3>Vortex Client</h3>
+                        <p>Main client package with ui customization and quality of life features.</p>
+                        <p class="disclaimer">(try with an alt account first)</p>
+                    </div>
+
+                    <a href="assets/userscripts/VortexClient.user.js" class="action-btn download-btn" id="clientDownload"
+                        target="_blank">Download</a>
+                </div>
+
+                <div class="download-item">
+                    <img src="assets/images/vorte3dmodel.png" class="download-icon no-select">
+                    <div class="download-info no-select">
+                        <h3>Vortex Capes</h3>
+                        <p>Free client side capes with custom textures and unique styles.</p>
+                        <p class="disclaimer">(try with an alt account first)</p>
+                    </div>
+                    <a href="assets/userscripts/VortexCapes.user.js" class="action-btn download-btn" id="capeDownload"
+                        target="_blank">Download</a>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div id="cinematics" class="cinematicsection">
+            <button class="download-close">✕</button>
+
+            <div class="slider-window">
+                <img id="slide" src="assets/images/Image-1.png" />
+                <div class="dots" id="dots"></div>
+            </div>
+        </div>
+    </main>
+
+
+    <script type="module" src="script.js"></script>
+
+</body>
+
+</html>
