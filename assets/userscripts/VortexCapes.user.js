@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Vortex Client Capes
 // @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  Vortex Capes for Bloxd.io
+// @version      1.1
+// @description  Vortex Client for Bloxd.io
 // @author       GE0RGECR
 // @match        https://*.bloxd.io/*
 // @icon         https://i.postimg.cc/xT3H10rq/vorte3dmodel.png
@@ -14,62 +14,6 @@
     //credit to realcherryy for the icon image [ https://www.youtube.com/@RealCherryy ]
     //if you wanna steal the code just dm me in discord: [ ge0rgecr_ ]
 
-    let ApplyCape = true;
-    const capeTexture = 'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/refs/heads/main/assets/vortex/Vortex_Default_Cape_Red.png';
-
-    function findNoa() {
-        const deepFindSafe = (obj, test, seen = new Set()) => {
-            if (!obj || typeof obj !== 'object' || seen.has(obj)) return null;
-            seen.add(obj);
-            try {
-                if (test(obj)) return obj;
-                for (const val of Object.values(obj)) {
-                    const res = deepFindSafe(val, test, seen);
-                    if (res) return res;
-                }
-            } catch (e) {}
-        };
-
-        let noa = null;
-        const getNoa = () => {
-            if (noa) return noa;
-            const element = document.querySelector('div.InventoryWrapper');
-            if (!element) return null;
-            const fiberKey = Object.keys(element).find(k => k.startsWith('__reactFiber$'));
-            if (!fiberKey) return null;
-            const fiber = element[fiberKey];
-            const test = (obj) => obj && obj.entities && typeof obj.entities.getState === 'function' && obj.camera;
-            noa = deepFindSafe(fiber.memoizedProps, test) || deepFindSafe(fiber.memoizedState, test);
-            window._noa = noa;
-            return noa;
-        };
-
-        const vortex = getNoa();
-
-        if (vortex) {
-            const cape = vortex.entities.getState(1, "cape")
-            ApplyCape = false;
-            cape.chooseCape("super");
-            const capeMesh = cape.mesh;
-
-            const CapeMaterial = capeMesh.material;
-            if (!CapeMaterial || !CapeMaterial.diffuseTexture) return;
-            CapeMaterial.diffuseTexture.updateURL(capeTexture);
-            CapeMaterial.diffuseTexture.hasAlpha = true;
-            CapeMaterial.disableLighting = false;
-
-
-            if (typeof CapeMaterial.markAsDirty === "function")
-                CapeMaterial.markAsDirty();
-        }
-        return vortex;
-    }
-
-    function checkState() {
-        const Ingame = document.querySelector(".InGameHeader");
-        if (Ingame && window.getComputedStyle(Ingame).display !== "none") {if (ApplyCape){ findNoa();}} else {ApplyCape = true;}
-    }
-    checkState();
-    setInterval(checkState, 3000);
-
+    const _0x4248c3=_0x26d2;(function(_0x22b0e7,_0x1ed33d){const _0xbd2ff7=_0x26d2,_0xbd1834=_0x22b0e7();while(!![]){try{const _0x740433=-parseInt(_0xbd2ff7(0x1ad))/0x1+parseInt(_0xbd2ff7(0x1a6))/0x2+-parseInt(_0xbd2ff7(0x1a3))/0x3*(parseInt(_0xbd2ff7(0x1bf))/0x4)+parseInt(_0xbd2ff7(0x1b8))/0x5*(parseInt(_0xbd2ff7(0x1c4))/0x6)+-parseInt(_0xbd2ff7(0x1be))/0x7+-parseInt(_0xbd2ff7(0x1c6))/0x8*(-parseInt(_0xbd2ff7(0x1a8))/0x9)+parseInt(_0xbd2ff7(0x1af))/0xa;if(_0x740433===_0x1ed33d)break;else _0xbd1834['push'](_0xbd1834['shift']());}catch(_0x1679da){_0xbd1834['push'](_0xbd1834['shift']());}}}(_0x3ce5,0xad7ee));let ApplyCape=!![];const capeTexture=_0x4248c3(0x1b6);function _0x26d2(_0x2f46b9,_0x4580f1){const _0x3ce556=_0x3ce5();return _0x26d2=function(_0x26d266,_0x31c6dc){_0x26d266=_0x26d266-0x1a0;let _0x35f49b=_0x3ce556[_0x26d266];if(_0x26d2['foNZkv']===undefined){var _0x2f0f71=function(_0x48e52e){const _0x5687b7='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';let _0x438892='',_0x963dd6='';for(let _0x23c959=0x0,_0xfde8ef,_0x4ad325,_0x3260ac=0x0;_0x4ad325=_0x48e52e['charAt'](_0x3260ac++);~_0x4ad325&&(_0xfde8ef=_0x23c959%0x4?_0xfde8ef*0x40+_0x4ad325:_0x4ad325,_0x23c959++%0x4)?_0x438892+=String['fromCharCode'](0xff&_0xfde8ef>>(-0x2*_0x23c959&0x6)):0x0){_0x4ad325=_0x5687b7['indexOf'](_0x4ad325);}for(let _0x42b602=0x0,_0x280529=_0x438892['length'];_0x42b602<_0x280529;_0x42b602++){_0x963dd6+='%'+('00'+_0x438892['charCodeAt'](_0x42b602)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(_0x963dd6);};_0x26d2['LdDDcW']=_0x2f0f71,_0x2f46b9=arguments,_0x26d2['foNZkv']=!![];}const _0x214e76=_0x3ce556[0x0],_0x56b2d2=_0x26d266+_0x214e76,_0x2db8b6=_0x2f46b9[_0x56b2d2];return!_0x2db8b6?(_0x35f49b=_0x26d2['LdDDcW'](_0x35f49b),_0x2f46b9[_0x56b2d2]=_0x35f49b):_0x35f49b=_0x2db8b6,_0x35f49b;},_0x26d2(_0x2f46b9,_0x4580f1);}function findNoa(){const _0x17764f=_0x4248c3,_0x48e52e=(_0x23c959,_0xfde8ef,_0x4ad325=new Set())=>{const _0x323b15=_0x26d2;if(!_0x23c959||typeof _0x23c959!==_0x323b15(0x1a5)||_0x4ad325[_0x323b15(0x1ae)](_0x23c959))return null;_0x4ad325[_0x323b15(0x1ba)](_0x23c959);try{if(_0xfde8ef(_0x23c959))return _0x23c959;for(const _0x3260ac of Object[_0x323b15(0x1aa)](_0x23c959)){const _0x42b602=_0x48e52e(_0x3260ac,_0xfde8ef,_0x4ad325);if(_0x42b602)return _0x42b602;}}catch(_0x280529){}};let _0x5687b7=null;const _0x438892=()=>{const _0x1ce0d2=_0x26d2;if(_0x5687b7)return _0x5687b7;const _0x3c31ef=document[_0x1ce0d2(0x1a9)]('div.InventoryWrapper');if(!_0x3c31ef)return null;const _0x34ae93=Object[_0x1ce0d2(0x1b1)](_0x3c31ef)[_0x1ce0d2(0x1a2)](_0x213d7a=>_0x213d7a[_0x1ce0d2(0x1bb)](_0x1ce0d2(0x1c1)));if(!_0x34ae93)return null;const _0x4e6023=_0x3c31ef[_0x34ae93],_0x4a40ad=_0x2cc525=>_0x2cc525&&_0x2cc525['entities']&&typeof _0x2cc525[_0x1ce0d2(0x1c3)][_0x1ce0d2(0x1b4)]===_0x1ce0d2(0x1b0)&&_0x2cc525[_0x1ce0d2(0x1b2)];return _0x5687b7=_0x48e52e(_0x4e6023[_0x1ce0d2(0x1ab)],_0x4a40ad)||_0x48e52e(_0x4e6023[_0x1ce0d2(0x1c5)],_0x4a40ad),window[_0x1ce0d2(0x1b5)]=_0x5687b7,_0x5687b7;},_0x963dd6=_0x438892();if(_0x963dd6){const _0x4dc289=_0x963dd6[_0x17764f(0x1c3)][_0x17764f(0x1b4)](0x1,_0x17764f(0x1b7));ApplyCape=![],_0x4dc289[_0x17764f(0x1b9)](_0x17764f(0x1a7));const _0x2ef86a=_0x4dc289[_0x17764f(0x1bc)],_0xd2ed85=_0x2ef86a[_0x17764f(0x1b3)];if(!_0xd2ed85||!_0xd2ed85[_0x17764f(0x1c2)])return;_0xd2ed85[_0x17764f(0x1c2)][_0x17764f(0x1a4)](capeTexture),_0xd2ed85['diffuseTexture']['hasAlpha']=!![],_0xd2ed85[_0x17764f(0x1ac)]=![];if(typeof _0xd2ed85[_0x17764f(0x1bd)]===_0x17764f(0x1b0))_0xd2ed85[_0x17764f(0x1bd)]();}return _0x963dd6;}function checkState(){const _0x53bddc=_0x4248c3,_0x242709=document[_0x53bddc(0x1a9)](_0x53bddc(0x1c7));_0x242709&&window[_0x53bddc(0x1a1)](_0x242709)[_0x53bddc(0x1a0)]!==_0x53bddc(0x1c0)?ApplyCape&&findNoa():ApplyCape=!![];}checkState(),setInterval(checkState,0xbb8);function _0x3ce5(){const _0x97d905=['C3rHCNrZv2L0Aa','BwvZAa','BwfYA0fZrgLYDhK','nZaYmtiWm1viDwfPzq','ngrhC1nJDa','BM9Uzq','x19YzwfJDezPyMvYja','zgLMzNvZzvrLEhr1CMu','zw50AxrPzxm','ntm2nty4nKHTzNfJCa','BwvTB2L6zwrtDgf0zq','ndeXntKYtuPJvMLN','lKLUr2fTzuHLywrLCG','zgLZCgXHEq','z2v0q29TChv0zwrtDhLSzq','zMLUza','mZyYndK5mhj4AMPswq','DxbKyxrLvvjm','B2jQzwn0','mJq5mteZofnWyMvMEG','C3vWzxi','ndvytLvhqxq','CxvLCNLtzwXLy3rVCG','DMfSDwvZ','BwvTB2L6zwrqCM9WCW','zgLZywjSzuXPz2H0Aw5N','nJu1ndm2C1HgqvLr','AgfZ','mte4mdmZodbRqxbuzuy','zNvUy3rPB24','A2v5CW','y2fTzxjH','Bwf0zxjPywW','z2v0u3rHDgu','x25Vyq','Ahr0Chm6lY9YyxCUz2L0AhvIDxnLCMnVBNrLBNqUy29Tl0Dft1jhrunsmc9wB3j0zxGTq2XPzw50l3jLzNmVAgvHzhmVBwfPBI9HC3nLDhmVDM9YDgv4l1zVCNrLEf9ezwzHDwX0x0nHCgvFuMvKlNbUzW','y2fWzq','nuD2wLLrua','y2HVB3nLq2fWzq','ywrK'];_0x3ce5=function(){return _0x97d905;};return _0x3ce5();}
 })();
+
