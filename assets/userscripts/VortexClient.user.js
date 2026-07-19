@@ -7,6 +7,7 @@
 // @homepageURL  https://georgecr0.github.io/Vortex-Client/
 // @icon         https://i.postimg.cc/fRpcmPqN/Vortex-Logo.png
 // @match        https://bloxd.io/*
+// @run-at       document-idle
 // @grant        none
 // ==/UserScript==
 
@@ -61,8 +62,8 @@
         'Utility': [
             {
                 name: 'Death Info', description: 'Displays death location', hasSettings: true, enabled: false,
-                onEnable: () => { deathinfoModule.start() },
-                onDisable: () => { deathinfoModule.stop() },
+                onEnable: () => {},
+                onDisable: () => {},
                 settings: [
                     { id: 'last_death', label: 'Your Last Death Was At', type: 'text', placeholder: 'X: ?, Y: ?, Z: ?', defaultValue: '' },
                 ]
@@ -155,12 +156,10 @@
     let coordsEnabled = false;
 
     const originalGetContext = HTMLCanvasElement.prototype.getContext;
-
     HTMLCanvasElement.prototype.getContext = function (...args) {
         const ctx = originalGetContext.apply(this, args);
         if (args[0] === '2d' && !ctx.__textHooked) {
             ctx.__textHooked = true;
-
             const originalFillText = ctx.fillText;
             ctx.fillText = function (text, x, y, ...rest) {
                 const str = String(text).trim();
@@ -185,44 +184,49 @@
         return ctx;
     };
 
-
     function checkState() {
         const Ingame = document.querySelector(".InGameHeader");
 
-
         if (Ingame && window.getComputedStyle(Ingame).display !== "none") {
             ClientHud.style.display = 'block';
-            setTimeout(() => {
-                if (usernameNoti === 'nah' && username !== null) {
-                    usernameNoti = 'done';
 
+            if (usernameNoti === 'nah' && username !== null) {
+                usernameNoti = 'done';
+                setTimeout(() => {
                     Notification.style.display = 'block';
                     Notification.style.opacity = '1';
-                    Notification.innerHTML = `Welcome to Vortex Client <span style="color: rgba(190, 90, 95, 1); font-weight: bolder ;">${username}</span> !!!`;
+                    Notification.innerHTML = `Welcome to Vortex Client <span style="color: rgba(190, 90, 95, 1); font-weight: bolder;">${username}</span> !!!`;
                     setTimeout(() => {
                         Notification.style.opacity = '0';
                         setTimeout(() => {
                             Notification.style.display = 'none';
                         }, 500);
                     }, 7000);
-                }
-            }, 1000);
+                }, 1000);
+            }
 
         } else {
             usernameNoti = 'nah';
             ClientHud.style.display = 'none';
             document.title = "Bloxd.io - Vortex Client";
-
             document.querySelectorAll("link[rel*='icon']").forEach(logo => logo.remove());
             const logo = document.createElement("link");
             logo.rel = "icon";
             logo.href = "https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/refs/heads/main/assets/vortex/blxd_logo.png";
             document.head.appendChild(logo);
-
         }
     }
     checkState();
-    setInterval(checkState, 2000);
+
+    const observer = new MutationObserver(() => {
+        checkState();
+    });
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["style", "class"]
+    });
 
     const hud = document.createElement('div');
     hud.style.position = 'fixed';
@@ -253,7 +257,7 @@
     menu.style.flexDirection = 'column';
     menu.style.justifyContent = 'center';
     menu.style.alignItems = 'center';
-    menu.style.backgroundImage = 'url(https://i.postimg.cc/fyR7DMPB/Vortex-Client-png.png)';
+    menu.style.backgroundImage = 'url(https://i.postimg.cc/VNFknpv6/Menu-Logo.png)';//https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/refs/heads/main/assets/vortex/Menu-Logo.png
     menu.style.backgroundRepeat = 'no-repeat';
     menu.style.backgroundSize = '265px 230px';
     menu.style.backgroundPosition = 'center calc(50% - 70px)';
@@ -335,7 +339,7 @@
     tabBar.appendChild(logoWrapper);
 
     const sidebarLogo = document.createElement('img');
-    sidebarLogo.src = 'https://i.postimg.cc/rwqnpQbv/logo-v2.png';
+    sidebarLogo.src = 'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/refs/heads/main/assets/vortex/Sidebar-Logo.png';//https://i.postimg.cc/rwqnpQbv/logo-v2.png
     sidebarLogo.style.width = '200px';
     sidebarLogo.style.height = 'auto';
     sidebarLogo.style.borderRadius = '0.4rem';
@@ -904,23 +908,87 @@
         btn.addEventListener('click', function () { mainMenuCon.style.display = 'flex'; menu.style.display = 'none'; gameui.style.display = ''; });
     });
 
+    const MenuTopBar = document.createElement("div");
+    MenuTopBar.style.position = "fixed";
+    MenuTopBar.style.top = "20px";
+    MenuTopBar.style.right = "20px";
+    MenuTopBar.style.display = "flex";
+    MenuTopBar.style.alignItems = "center";
+    MenuTopBar.style.gap = "10px";
+    MenuTopBar.style.zIndex = "99999";
+
+    const TimeDisplay = document.createElement("div");
+    TimeDisplay.textContent = "00:00 -M";
+    TimeDisplay.style.height = "55px";
+    TimeDisplay.style.minWidth = "120px";
+    TimeDisplay.style.display = "flex";
+    TimeDisplay.style.alignItems = "center";
+    TimeDisplay.style.boxSizing = "border-box";
+    TimeDisplay.style.justifyContent = "center";
+    TimeDisplay.style.border = "1px solid rgba(255,255,255,0.07)";
+    TimeDisplay.style.backdropFilter = "blur(5px)";
+    TimeDisplay.style.backgroundColor = "rgba(10,12,16,0.6)";
+    TimeDisplay.style.borderRadius = "0.6rem";
+    TimeDisplay.style.color = "#fff";
+
+    const CloseBtn = document.createElement('button');
+    CloseBtn.innerHTML = `<i class="ri-close-fill"></i>` ;
+    CloseBtn.style.top = "20px";
+    CloseBtn.style.right = "20px";
+    CloseBtn.style.height = "55px";
+    CloseBtn.style.width = "55px";
+    CloseBtn.style.boxSizing = "border-box";
+    CloseBtn.style.border = '1px solid rgba(255, 255, 255, 0.07)';
+    CloseBtn.style.backdropFilter = 'blur(5px)';
+    CloseBtn.style.backgroundColor = 'rgba(10, 12, 16, 0.6)';
+    CloseBtn.style.borderRadius = '0.6rem';
+    CloseBtn.style.color = 'rgb(217, 48, 48)';
+    CloseBtn.style.fontSize = '35px';
+    CloseBtn.style.cursor = 'pointer';
+    MenuTopBar.appendChild(TimeDisplay);
+    MenuTopBar.appendChild(CloseBtn);
+    hud.appendChild(MenuTopBar);
+
+    function updateTime() {
+        const now = new Date();
+        TimeDisplay.textContent = now.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+        setTimeout(updateTime, 60000 - (now.getSeconds() * 1000));
+    }
+
+    updateTime();
+
     let menuVisible = true;
     const toggleMenuKey = 'ShiftRight';
-    window.addEventListener('keydown', function (e) {
+    function updateMenu() {
+        menu.style.display = menuVisible ? 'flex' : 'none';
+        MenuTopBar.style.display = menuVisible ? 'flex' : 'none';
+        hud.style.backgroundColor = menuVisible ? 'rgba(0, 0, 0, 0.8)' : 'transparent';
+        hud.style.backdropFilter = menuVisible ? 'blur(5px)' : 'blur(0px)';
+        hud.style.pointerEvents = menuVisible ? 'auto' : 'none';
+        mainMenuCon.style.display = 'none';
+        gameui.style.display = 'block';
+        gameui.style.filter = menuVisible ? 'grayscale(80%) brightness(0.6)' : 'grayscale(0%) brightness(1)';
+    }
+
+    window.addEventListener("keydown", function (e) {
         if (e.code === toggleMenuKey) {
             menuVisible = !menuVisible;
-            menu.style.display = menuVisible ? 'flex' : 'none';
-            hud.style.backgroundColor = menuVisible ? 'rgba(0, 0, 0, 0.8)' : 'transparent';
-            hud.style.backdropFilter = menuVisible ? 'blur(5px)' : 'blur(0px)';
-            hud.style.pointerEvents = menuVisible ? 'auto' : 'none';
-            mainMenuCon.style.display = 'none';
-            gameui.style.display = 'block';
-            gameui.style.filter = menuVisible ? 'grayscale(80%) brightness(0.6)' : 'grayscale(0%) brightness(1)';
+            updateMenu();
         }
     });
 
+    CloseBtn.addEventListener("click", () => {
+        menuVisible = false;
+        updateMenu();
+    });
+    updateMenu();
+
     setContent(tabs[0].name, tabs[0].description);
     setTimeout(initializeModules, 2000);
+
 
     /* CPS COUNTER MODULE (this is not ai bruh its just so its more clean) */
     const cpsModule = (function () {
@@ -928,13 +996,9 @@
         let clicksTextSpan = null;
         let clickListener = null;
         let updateIntervalId = null;
-        let positionIntervalId = null;
-
+        let observer = null;
         let leftClicks = 0;
         let rightClicks = 0;
-        let lastLeftClickTime = 0;
-        let lastRightClickTime = 0;
-
         const start = () => {
             if (cpsHud) return;
             cpsHud = document.createElement("div");
@@ -945,7 +1009,7 @@
             cpsHud.style.alignItems = 'center';
             cpsHud.style.justifyContent = 'center';
             cpsHud.style.fontWeight = '500';
-            cpsHud.style.zIndex = '0.5';
+            cpsHud.style.zIndex = '1';
             cpsHud.style.display = 'none';
             cpsHud.style.pointerEvents = 'none';
             cpsHud.style.boxSizing = "border-box";
@@ -961,8 +1025,6 @@
             cpsHud.appendChild(cpsTextSpan);
             cpsHud.appendChild(clicksTextSpan);
             ClientHud.appendChild(cpsHud);
-            lastLeftClickTime = Date.now();
-            lastRightClickTime = Date.now();
             clickListener = (e) => {
                 if (e.button === 0) {
                     leftClicks++;
@@ -1008,30 +1070,28 @@
                 cpsHud.style.width = `${cpsHud.offsetWidth + 10}px`;
             };
 
-            setInterval(() => {
+            updateIntervalId = setInterval(() => {
                 clicksTextSpan.innerText = `${leftClicks} │ ${rightClicks}`;
                 leftClicks = 0;
                 rightClicks = 0;
             }, 1000);
 
-            positionIntervalId = setInterval(updateBoxPosition, 250);
+            observer = new MutationObserver(() => {
+                updateBoxPosition();
+            });
+            updateBoxPosition();
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
         };
 
         const stop = () => {
-            clearInterval(updateIntervalId);
-            clearInterval(positionIntervalId);
-            updateIntervalId = positionIntervalId = null;
-
-            if (clickListener) {
-                document.removeEventListener("mousedown", clickListener);
-                clickListener = null;
-            }
-
-            if (cpsHud) {
-                cpsHud.remove();
-                cpsHud = null;
-            }
-
+            if (observer) { observer.disconnect(); observer = null; }
+            if (updateIntervalId) { clearInterval(updateIntervalId); updateIntervalId = null; }
+            if (clickListener) { document.removeEventListener("mousedown", clickListener); clickListener = null; }
+            if (cpsHud) { cpsHud.remove(); cpsHud = null; }
             leftClicks = 0;
             rightClicks = 0;
         };
@@ -1045,12 +1105,11 @@
     /* PING COUNTER MODULE (this is not ai bruh its just so its more clean) */
     const pingModule = (function () {
         let pingHud = null;
+        let observer = null;
         let msTextSpan = null;
         let pingUpdateIntervalId = null;
         let textUpdateIntervalId = null;
-        let positionIntervalId = null;
         let ping = 0;
-
         const start = () => {
             if (pingHud) return;
             pingHud = document.createElement("div");
@@ -1060,7 +1119,7 @@
             pingHud.style.alignItems = 'center';
             pingHud.style.justifyContent = 'center';
             pingHud.style.fontWeight = '500';
-            pingHud.style.zIndex = '0.5';
+            pingHud.style.zIndex = '1';
             pingHud.style.pointerEvents = 'none';
             pingHud.style.boxSizing = "border-box";
             const pingTextSpan = document.createElement("span");
@@ -1137,21 +1196,24 @@
                 }
             }, 1000);
             pingUpdateIntervalId = setInterval(updatePing, 2500);
-            positionIntervalId = setInterval(updateBoxPosition, 300);
             updatePing();
+
+            observer = new MutationObserver(() => {
+                updateBoxPosition();
+            });
             updateBoxPosition();
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+
         };
-
         const stop = () => {
-            clearInterval(pingUpdateIntervalId);
-            clearInterval(textUpdateIntervalId);
-            clearInterval(positionIntervalId);
-            pingUpdateIntervalId = textUpdateIntervalId = positionIntervalId = null;
-            if (pingHud) {
-                pingHud.remove();
-                pingHud = null;
-            }
-
+            if (observer) { observer.disconnect(); observer = null; }
+            if (pingUpdateIntervalId) { clearInterval(pingUpdateIntervalId); pingUpdateIntervalId = null; }
+            if (textUpdateIntervalId) { clearInterval(textUpdateIntervalId); textUpdateIntervalId = null; }
+            if (pingHud) { pingHud.remove(); pingHud = null; }
             msTextSpan = null;
             ping = 0;
         };
@@ -1160,8 +1222,6 @@
             start,
             stop
         };
-
-
     })();
 
     /* ARMOUR VIEW  MODULE (this is not ai bruh its just so its more clean) */
@@ -1203,7 +1263,7 @@
         const createDisplayBox = () => {
             displayBox = document.createElement('div');
             const initialStyles = {
-                position: 'fixed', zIndex: '0.5', display: 'flex', padding: '5px',
+                position: 'fixed', zIndex: '1', display: 'flex', padding: '5px',
                 backgroundColor: 'transparent', pointerEvents: 'none'
             };
 
@@ -1311,7 +1371,6 @@
 
         const start = () => {
             if (keystrokesHud) return;
-
             keystrokesHud = document.createElement("div");
             keystrokesHud.style.position = "fixed";
             keystrokesHud.style.bottom = "65px";
@@ -1320,7 +1379,7 @@
             keystrokesHud.style.flexDirection = "column";
             keystrokesHud.style.gap = "4px";
             keystrokesHud.style.transform = 'scale(1.0)';
-            keystrokesHud.style.zIndex = "1000";
+            keystrokesHud.style.zIndex = "1";
             keystrokesHud.style.pointerEvents = "none";
 
             const row1 = document.createElement("div");
