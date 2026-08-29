@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Vortex Client
 // @namespace    http://tampermonkey.net/
-// @version      Rebound
+// @version      Rebound〔1.0〕
 // @description  Vortex Client is a project to make Bloxd fun again...
 // @author       GEORGECR
 // @homepageURL  https://georgecr0.github.io/Vortex-Client/
@@ -13,7 +13,7 @@
 
 (function () {
     'use strict';
-    //if you wanna steal the code just dm me in discord: [ ge0rgecr_ ]
+    //if you wanna steal the code just dm me in discord: [ ge0rgecr_ ] if not im gonna find u
 
     /* MODULES (this is not ai bruh its just so its more clean) */
     const modules = {
@@ -23,7 +23,7 @@
                 onEnable: () => { keystrokesModule.start() },
                 onDisable: () => { keystrokesModule.stop() },
                 settings: [
-
+                    { id: 'Keystrokes_Disclaimer', label: '', type: 'footerText' , defaultValue: 'Nothing here yet' },
                 ]
             },
         ],
@@ -54,24 +54,45 @@
                 onEnable: () => { cinematicModule.start() },
                 onDisable: () => { cinematicModule.stop() },
                 settings: [
-                    { id: 'cinematic_key', label: 'Action Key', type: 'input' , defaultValue: 'H' },
+                    { id: 'cinematic_key', label: 'Action Key', type: 'input' , defaultValue: 'K' },
                 ]
             }
         ],
 
         'Utility': [
             {
-                name: 'Death Info', description: 'Displays death location', hasSettings: true, enabled: false,
-                onEnable: () => {},
-                onDisable: () => {},
+                name: 'Ui Scaling', description: 'Change the size of your hud', hasSettings: true, enabled: false,
+                onEnable: () => { UiScaleModule.start() },
+                onDisable: () => { UiScaleModule.stop() },
                 settings: [
-                    { id: 'last_death', label: 'Your Last Death Was At', type: 'text', placeholder: 'X: ?, Y: ?, Z: ?', defaultValue: '' },
+                    { id: 'Ui_Size', label: 'Ui Size', type: 'slider', min: 0.3, max: 1.5, step: 0.1, defaultValue: 1.0 },
+                    { id: 'Ui_Disclaimer', label: '', type: 'footerText' , defaultValue: 'This changes the size of only your in game ui' },
                 ]
             },
         ],
         'Cosmetics': [
             {
                 name: 'Custom Capes', description: 'Personalize Your Look',
+            },
+            {
+                name: 'Nametags', description: 'Customize player nametags', hasSettings: true, enabled: false,
+                onEnable: () => { nametagsModule.start() },
+                onDisable: () => { nametagsModule.stop() },
+                settings: [
+                    { id: 'nametag_style', label: '', type: 'imagepicker', defaultValue: 'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Nametags/nebula.webp',
+                     images: [
+                         'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Nametags/nebula.webp',
+                         'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Nametags/galaxy.png',
+                         'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Nametags/red-trees.webp',
+                         'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Nametags/sunset.jpg',
+                         'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Nametags/dark-place.webp',
+                         'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Nametags/pink-clouds.png',
+                         'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Nametags/gaming.jpg',
+                         'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Nametags/green-galaxy.png',
+                         'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Nametags/purp-galaxy.jpg',
+                     ] },
+                    { id: 'nametag_Disclaimer', label: '', type: 'footerText' , defaultValue: 'Rejoin the lobby to see your new nametag' },
+                ]
             },
         ],
         'Settings': [
@@ -149,11 +170,13 @@
     ClientHud.appendChild(Notification);
 
     /* GET CANVAS CONTENT FUNCTIONS username and coords (this is not ai bruh its just so its more clean) */
+    let BlxdLogo = "https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/blxd_logo.png";
     let username = null;
-    let usernameNoti = 'nah';
-
-    let coords = [];
-    let coordsEnabled = false;
+    let OffReplayViewer = true;
+    let NameDisplay = null;
+    let usernameNoti = true;
+    let ApplyNametags = false;
+    let ApplyUiScaling = false;
 
     const originalGetContext = HTMLCanvasElement.prototype.getContext;
     HTMLCanvasElement.prototype.getContext = function (...args) {
@@ -167,16 +190,6 @@
                 if (!isNumber && username === null) {
                     username = str;
                 }
-
-                if (coordsEnabled) {
-                    if (/^-?\d+\.\d+$/.test(str)) {
-                        coords.push(Number(str));
-                        if (coords.length > 3) {
-                            coords.shift();
-                        }
-                    }
-                }
-
                 return originalFillText.call(this, text, x, y, ...rest);
             };
         }
@@ -186,12 +199,22 @@
 
     function checkState() {
         const Ingame = document.querySelector(".InGameHeader");
+        const ReplayViewer = document.querySelector(".ReplayViewerOverlay");
 
         if (Ingame && window.getComputedStyle(Ingame).display !== "none") {
-            ClientHud.style.display = 'block';
 
-            if (usernameNoti === 'nah' && username !== null) {
-                usernameNoti = 'done';
+            if (ReplayViewer && window.getComputedStyle(ReplayViewer).display !== "none") {
+                OffReplayViewer = false;
+                ClientHud.style.display = "none";
+                return;
+            }
+
+            ClientHud.style.display = 'block';
+            OffReplayViewer = true;
+            if (usernameNoti && username !== null) {
+                NameDisplay.innerHTML =
+                    `<img style=" border-radius: 5px ; aspect-ratio: 1; height: 60%; image-rendering: pixelated; margin-right: 7px; border: 2px solid transparent; outline: 1px solid rgba(255,255,255,0.09);" src="${BlxdLogo}">${username}`;
+                usernameNoti = false;
                 setTimeout(() => {
                     Notification.style.display = 'block';
                     Notification.style.opacity = '1';
@@ -204,21 +227,26 @@
                     }, 7000);
                 }, 1000);
             }
-
         } else {
-            usernameNoti = 'nah';
+            usernameNoti = true;
+            ApplyNametags = true;
+            ApplyUiScaling = true;
+            OffReplayViewer = true;
             ClientHud.style.display = 'none';
             document.title = "Bloxd.io - Vortex Client";
-            document.querySelectorAll("link[rel*='icon']").forEach(logo => logo.remove());
-            const logo = document.createElement("link");
-            logo.rel = "icon";
-            logo.href = "https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/refs/heads/main/assets/vortex/blxd_logo.png";
-            document.head.appendChild(logo);
+            if (username == null) {
+                const menunamedisplay = document.querySelector(".PlayerNamePreview")?.textContent.trim();
+                if (!menunamedisplay) return;
+                username = menunamedisplay;
+                NameDisplay.innerHTML =
+                    `<img style=" border-radius: 5px ; aspect-ratio: 1; height: 60%; image-rendering: pixelated; margin-right: 7px; border: 2px solid transparent; outline: 1px solid rgba(255,255,255,0.09);" src="${BlxdLogo}">${username}`;
+            }
+
         }
     }
     checkState();
 
-    const observer = new MutationObserver(() => {
+    let observer = new MutationObserver(() => {
         checkState();
     });
     observer.observe(document.body, {
@@ -227,6 +255,12 @@
         attributes: true,
         attributeFilter: ["style", "class"]
     });
+
+    document.querySelectorAll("link[rel*='icon']").forEach(logo => logo.remove());
+    const logo = document.createElement("link");
+    logo.rel = "icon";
+    logo.href = BlxdLogo;
+    document.head.appendChild(logo);
 
     const hud = document.createElement('div');
     hud.style.position = 'fixed';
@@ -257,7 +291,7 @@
     menu.style.flexDirection = 'column';
     menu.style.justifyContent = 'center';
     menu.style.alignItems = 'center';
-    menu.style.backgroundImage = 'url(https://i.postimg.cc/VNFknpv6/Menu-Logo.png)';//https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/refs/heads/main/assets/vortex/Menu-Logo.png
+    menu.style.backgroundImage = 'url(https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Menu-Logo.png)';
     menu.style.backgroundRepeat = 'no-repeat';
     menu.style.backgroundSize = '265px 230px';
     menu.style.backgroundPosition = 'center calc(50% - 70px)';
@@ -339,14 +373,14 @@
     tabBar.appendChild(logoWrapper);
 
     const sidebarLogo = document.createElement('img');
-    sidebarLogo.src = 'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/refs/heads/main/assets/vortex/Sidebar-Logo.png';//https://i.postimg.cc/rwqnpQbv/logo-v2.png
+    sidebarLogo.src = 'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Sidebar-Logo.png';//https://i.postimg.cc/rwqnpQbv/logo-v2.png
     sidebarLogo.style.width = '200px';
     sidebarLogo.style.height = 'auto';
     sidebarLogo.style.borderRadius = '0.4rem';
     logoWrapper.appendChild(sidebarLogo);
 
     const versionLabel = document.createElement('div');
-    versionLabel.textContent = 'Version Rebound';
+    versionLabel.textContent = 'Version Rebound 1.0';
     versionLabel.style.fontSize = '13px';
     versionLabel.style.fontWeight = 'lighter';
     versionLabel.style.color = 'rgba(255, 255, 255, 0.3)';
@@ -691,6 +725,7 @@
                     slider.addEventListener('input', () => {
                         valueLabel.textContent = parseFloat(slider.value).toFixed(1);
                         saveSetting(module.name, setting.id, parseFloat(slider.value));
+                        if (UiScaleModule.updateScale) { UiScaleModule.updateScale();}
                     });
                     controlWrapper.appendChild(slider);
                     controlWrapper.appendChild(valueLabel);
@@ -801,21 +836,57 @@
                     settingWrapper.appendChild(textInput);
                     break;
                 }
-                case 'text': {
+                case 'footerText': {
                     const textDisplay = document.createElement('div');
-
-                    textDisplay.textContent = value || setting.placeholder || '';
-                    textDisplay.style.backgroundColor = 'rgba(0,0,0,0.2)';
+                    textDisplay.textContent = value || '';
+                    textDisplay.style.backgroundColor = 'transparent';
                     textDisplay.style.color = 'rgba(255,255,255,0.8)';
-                    textDisplay.style.border = '1px solid rgba(255,255,255,0.08)';
-                    textDisplay.style.borderRadius = '8px';
-                    textDisplay.style.padding = '8px 12px';
-                    textDisplay.style.textAlign = 'center';
                     textDisplay.style.fontSize = '14px';
-                    textDisplay.style.minWidth = '150px';
+                    textDisplay.style.position = 'absolute';
+                    textDisplay.style.bottom = '20px';
+                    textDisplay.style.left = '0';
+                    textDisplay.style.textAlign = 'center';
+                    textDisplay.style.width = '100%';
+                    textDisplay.style.height = '20px';
                     textDisplay.style.userSelect = 'text';
 
                     settingWrapper.appendChild(textDisplay);
+                    break;
+                }
+                case 'imagepicker': {
+                    const picker = document.createElement('div');
+                    picker.style.display = 'flex';
+                    picker.style.flexWrap = 'wrap';
+                    picker.style.justifyContent = 'center';
+                    picker.style.gap = '16px';
+                    picker.style.width = '100%';
+                    picker.style.padding = '10px 0';
+
+                    setting.images.forEach(url => {
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.style.width = '190px';
+                        img.style.height = '110px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '10px';
+                        img.style.cursor = 'pointer';
+                        img.style.border = value === url ? '3px solid #b84b4b' : '3px solid transparent';
+                        img.style.transition = '0.2s';
+                        img.addEventListener('mouseenter', () => { img.style.transform = 'scale(1.03)'; });
+                        img.addEventListener('mouseleave', () => { img.style.transform = 'scale(1)';});
+
+                        img.addEventListener('click', () => {
+                            value === url;
+                            saveSetting(module.name, setting.id, url);
+
+                            if (nametagsModule.updateImage) { nametagsModule.updateImage();}// for the c nametags module
+
+                            picker.querySelectorAll('img').forEach(i => { i.style.border = '3px solid transparent'; });
+                            img.style.border = '3px solid #b84b4b';
+                        });
+                        picker.appendChild(img);
+                    });
+                    settingWrapper.appendChild(picker);
                     break;
                 }
             }
@@ -931,6 +1002,23 @@
     TimeDisplay.style.borderRadius = "0.6rem";
     TimeDisplay.style.color = "#fff";
 
+    NameDisplay = document.createElement("div");
+    NameDisplay.innerHTML = "Vortex User";
+    NameDisplay.style.height = "55px";
+    NameDisplay.style.minWidth = "60px";
+    NameDisplay.style.display = "flex";
+    NameDisplay.style.padding = "0px 10px 0px";
+    NameDisplay.style.alignItems = "center";
+    NameDisplay.style.boxSizing = "border-box";
+    NameDisplay.style.justifyContent = "center";
+    NameDisplay.style.border = "1px solid rgba(255,255,255,0.09)";
+    NameDisplay.style.backdropFilter = "blur(5px)";
+    NameDisplay.style.backgroundColor = "rgba(10,12,16,0.6)";
+    NameDisplay.style.borderRadius = "0.6rem";
+    NameDisplay.style.color = "#b82833";
+    NameDisplay.style.fontWeight = "800";
+    NameDisplay.style.textShadow = " 0 0 15px #7c363b";
+
     const CloseBtn = document.createElement('button');
     CloseBtn.innerHTML = `<i class="ri-close-fill"></i>` ;
     CloseBtn.style.top = "20px";
@@ -945,6 +1033,7 @@
     CloseBtn.style.color = 'rgb(217, 48, 48)';
     CloseBtn.style.fontSize = '35px';
     CloseBtn.style.cursor = 'pointer';
+    MenuTopBar.appendChild(NameDisplay);
     MenuTopBar.appendChild(TimeDisplay);
     MenuTopBar.appendChild(CloseBtn);
     hud.appendChild(MenuTopBar);
@@ -962,6 +1051,13 @@
 
     let menuVisible = true;
     const toggleMenuKey = 'ShiftRight';
+    const BlxdPointerLock = Element.prototype.requestPointerLock;
+
+    Element.prototype.requestPointerLock = function (...args) {
+        if (menuVisible) { return Promise.reject( new DOMException("Pointer lock disabled", "NotAllowedError") ); }
+        return BlxdPointerLock.apply(this, args);
+    };
+
     function updateMenu() {
         menu.style.display = menuVisible ? 'flex' : 'none';
         MenuTopBar.style.display = menuVisible ? 'flex' : 'none';
@@ -976,6 +1072,7 @@
     window.addEventListener("keydown", function (e) {
         if (e.code === toggleMenuKey) {
             menuVisible = !menuVisible;
+            if(menuVisible) { document.exitPointerLock(); }
             updateMenu();
         }
     });
@@ -989,6 +1086,29 @@
     setContent(tabs[0].name, tabs[0].description);
     setTimeout(initializeModules, 2000);
 
+    const sound = new Audio("https://github.com/GEORGECR0/Vortex-Client/raw/main/assets/vortex/Vortex%20Click%20Sound%20Effect.mp3");
+
+    sound.preload = "auto";
+    sound.volume = 0.5;
+
+    function playClickSound() {
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
+    }
+
+    document.addEventListener("click", (event) => {
+        const element = event.target.closest( "button, input, select, textarea, [role='combobox']");
+        if (!element) return;
+        playClickSound();
+    }, true);
+
+    document.addEventListener("input", (event) => {
+        if ( event.target.matches("input[type='range'], input[type='checkbox'], input[type='radio']") ) { playClickSound();}
+    }, true);
+
+    document.addEventListener("change", (event) => {
+        if (event.target.matches("select")) {playClickSound();}
+    }, true);
 
     /* CPS COUNTER MODULE (this is not ai bruh its just so its more clean) */
     const cpsModule = (function () {
@@ -1046,11 +1166,16 @@
 
                 const fps = document.querySelector('.FpsWrapperDiv');
                 const coords = document.querySelectorAll('.CoordinateUI');
+                const daynight = document.querySelectorAll('.HeaderChip');
                 const fpsVisible = fps && window.getComputedStyle(fps).display !== 'none';
                 const visibleCoords = Array.from(coords).filter(c => window.getComputedStyle(c).display !== 'none');
+                const visibleTimeUi = Array.from(daynight).filter(c => window.getComputedStyle(c).display !== 'none');
                 let targetRect = null;
 
-                if (visibleCoords.length > 0) {
+                if (visibleTimeUi.length > 0) {
+                    const rightmostTimeUi = visibleTimeUi.reduce((a, b) => a.getBoundingClientRect().right > b.getBoundingClientRect().right ? a : b);
+                    targetRect = rightmostTimeUi.getBoundingClientRect();
+                }else if (visibleCoords.length > 0) {
                     const rightmostCoord = visibleCoords.reduce((a, b) => a.getBoundingClientRect().right > b.getBoundingClientRect().right ? a : b);
                     targetRect = rightmostCoord.getBoundingClientRect();
                 } else if (fpsVisible) {
@@ -1065,7 +1190,7 @@
                 const headerStyle = window.getComputedStyle(header);
                 cpsHud.style.background = headerStyle.backgroundColor;
                 cpsHud.style.border = headerStyle.border;
-                cpsHud.style.borderRadius = headerStyle.borderRadius;
+                cpsHud.style.borderRadius = headerStyle.borderTopRightRadius;
                 cpsHud.style.width = 'auto';
                 cpsHud.style.width = `${cpsHud.offsetWidth + 10}px`;
             };
@@ -1115,6 +1240,7 @@
             pingHud = document.createElement("div");
             pingHud.style.position = "fixed";
             pingHud.style.color = "#fff";
+            pingHud.id = 'pingDisplay';
             pingHud.style.display = 'none';
             pingHud.style.alignItems = 'center';
             pingHud.style.justifyContent = 'center';
@@ -1157,21 +1283,24 @@
 
                 const fps = document.querySelector('.FpsWrapperDiv');
                 const coords = document.querySelectorAll('.CoordinateUI');
+                const daynight = document.querySelectorAll('.HeaderChip');
                 const cpsElement = document.getElementById('cpsDisplay');
 
                 const fpsVisible = fps && window.getComputedStyle(fps).display !== 'none';
-                const visibleCoords = Array.from(coords).filter(c => window.getComputedStyle(c).display !== 'none');
+                const visibleCoords = Array.from(coords).filter(c => window.getComputedStyle(c).display !== 'none')
+                const visibleTimeUi = Array.from(daynight).filter(c => window.getComputedStyle(c).display !== 'none');
                 const cpsVisible = cpsElement && window.getComputedStyle(cpsElement).display !== 'none';
 
                 let targetRect = null;
 
                 if (cpsVisible) {
                     targetRect = cpsElement.getBoundingClientRect();
+                } else if (visibleTimeUi.length > 0) {
+                    const rightmostTimeUi = visibleTimeUi.reduce((a, b) => a.getBoundingClientRect().right > b.getBoundingClientRect().right ? a : b);
+                    targetRect = rightmostTimeUi.getBoundingClientRect();
                 } else if (visibleCoords.length > 0) {
-                    targetRect = visibleCoords.reduce((rightmost, c) => {
-                        const rect = c.getBoundingClientRect();
-                        return !rightmost || rect.right > rightmost.right ? rect : rightmost;
-                    }, null);
+                    const rightmostCoord = visibleCoords.reduce((a, b) => a.getBoundingClientRect().right > b.getBoundingClientRect().right ? a : b);
+                    targetRect = rightmostCoord.getBoundingClientRect();
                 } else if (fpsVisible) {
                     targetRect = fps.getBoundingClientRect();
                 } else {
@@ -1185,7 +1314,7 @@
                 const headerStyle = window.getComputedStyle(header);
                 pingHud.style.background = headerStyle.backgroundColor;
                 pingHud.style.border = headerStyle.border;
-                pingHud.style.borderRadius = headerStyle.borderRadius;
+                pingHud.style.borderRadius = headerStyle.borderTopRightRadius;
                 pingHud.style.width = 'auto';
                 pingHud.style.width = `${pingHud.offsetWidth + 10}px`;
             };
@@ -1298,8 +1427,14 @@
                 if (!originalItem) return;
                 const clone = originalItem.cloneNode(true);
                 clone.className = 'InvenItem inven-item-clone';
+                /*    clone.style.filter = `
+        drop-shadow(3px 0 0 black)
+        drop-shadow(-3px 0 0 black)
+        drop-shadow(0 3px 0 black)
+        drop-shadow(0 -3px 0 black)
+    `; */
                 clone.removeAttribute('id');
-                setStyles(clone, { backgroundColor: 'transparent', border: 'none', marginBottom: '-7px', transform: 'scale(1.0)' });
+                setStyles(clone, {backgroundColor: 'transparent', border: 'none', marginBottom: '-7px', transform: 'scale(1.0)' });
                 const unfilledSlot = clone.querySelector('.InvenItemUnfilled');
                 if (unfilledSlot) {
                     unfilledSlot.style.backgroundImage = `url("${ARMOR_IMG_URL}")`;
@@ -1332,6 +1467,95 @@
         return {
             start,
             stop,
+        };
+    })();
+
+    const UiScaleModule = (function() {
+        let updateIntervalId = null;
+        let observer = null;
+
+        const getSettings = () => {
+            const savedData = JSON.parse(localStorage.getItem(storageKey)) || {};
+            const savedSettings = savedData['Ui Scaling']?.settings || {};
+            return {
+                scale: savedSettings.Ui_Size !== undefined ? savedSettings.Ui_Size : 1.0,
+            };
+        };
+
+        function SetScale() {
+            if (ApplyUiScaling){
+                const Header = document.querySelector(".InGameHeaderContainer");
+                if (!Header) return;
+                ApplyUiScaling = false;
+                const BottomMiddle = document.querySelector(".BottomMiddleElements");
+                const BottomRight = document.querySelector(".BottomRightElements");
+                const TopLeft = document.querySelector(".TopLeftElements");
+                const TopRight = document.querySelector(".TopRightElements");
+                const BottomLeft = document.querySelector(".BottomLeftElements");
+                const CenterLeft = document.querySelector(".RightInfoDivContainer");
+                const Ping = document.querySelector("#pingDisplay");
+                const Cps = document.querySelector("#cpsDisplay");
+
+                const settings = getSettings();
+
+                BottomLeft.style.transform = `scale(${settings.scale})`;
+                BottomLeft.style.transformOrigin = 'left bottom ';
+
+                TopLeft.style.transform = `scale(${settings.scale})`;
+                TopLeft.style.transformOrigin = 'left top ';
+
+                Header.style.transform = `scale(${settings.scale})`;
+                Header.style.transformOrigin = 'left top ';
+
+                BottomRight.style.transform = `scale(${settings.scale})`;
+                BottomRight.style.transformOrigin = 'right bottom ';
+
+                TopRight.style.transform = `scale(${settings.scale})`;
+                TopRight.style.transformOrigin = 'right top ';
+
+                BottomMiddle.style.transform = `scale(${settings.scale})`;
+                BottomMiddle.style.transformOrigin = 'center bottom ';
+
+                if (CenterLeft) {
+                    CenterLeft.style.transform = `scale(${settings.scale})`;
+                    CenterLeft.style.transformOrigin = 'right center ';
+                }
+                if (Ping) {
+                    Ping.style.transform = `scale(${settings.scale})`;
+                    Ping.style.transformOrigin = 'left top ';
+                }
+                if (Cps) {
+                    Cps.style.transform = `scale(${settings.scale})`;
+                    Cps.style.transformOrigin = 'left top ';
+                }
+
+            }
+        }
+
+        const start = () => {
+            ApplyUiScaling = true;
+
+            observer = new MutationObserver(() => {
+                SetScale();
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        };
+
+        const stop = () => {
+            ApplyUiScaling = false;
+
+            if (observer) { observer.disconnect(); observer = null; }
+        };
+        const updateScale = () => { SetScale(); ApplyUiScaling = true; };
+
+        return {
+            start,
+            stop,
+            updateScale
         };
     })();
 
@@ -1512,60 +1736,7 @@
         };
     })();
 
-    const deathinfoModule = (function () {
-        let ResSearchIntervalId = null;
-        let coordsNoti = 'nah';
-
-        const setLastDeath = (x, y, z) => {
-            saveSetting('Death Info','last_death',`X: ${x} Y: ${y} Z: ${z}`);
-        };
-
-        const start = () => {
-            coordsEnabled = true;
-
-            const ResScreenSearch = () => {
-                const element = document.querySelector(".RespawnBackgroundScreen");
-                if (element && element.parentElement) {
-                    if (getComputedStyle(element.parentElement).opacity === "1") {
-                        console.log(coordsNoti);
-                        if (coords.length === 3 && coordsNoti === 'nah') {
-                            const [x, y, z] = coords;
-                            coordsNoti = 'done';
-                            setLastDeath(x, y, z);
-                            setTimeout(() => {
-                                Notification.style.display = 'block';
-                                Notification.style.opacity = '1';
-                                Notification.innerHTML = `You <span style="color: red; font-weight: bolder;">Died</span> at X: <span style="color:#5865F2; font-weight:bold;">${x}</span> Y: <span style="color:#5865F2; font-weight:bold;">${y}</span> Z: <span style="color:#5865F2; font-weight:bold;">${z}</span> <span style="opacity:0.7; font-size: smaller ;">(saved in mod settings too)</span>`;
-                                setTimeout(() => {
-                                    Notification.style.opacity = '0';
-                                    setTimeout(() => {
-                                        Notification.style.display = 'none';
-                                        coordsNoti = 'nah';
-                                    }, 500);
-                                }, 7000);
-                            }, 5000);
-                        }
-                    }
-                }
-            };
-
-
-            ResSearchIntervalId = setInterval(ResScreenSearch, 4500);
-        };
-
-
-        const stop = () => {
-            clearInterval(ResSearchIntervalId);
-            ResSearchIntervalId = null;
-            coordsEnabled = false;
-        };
-
-        return {
-            start,
-            stop
-        };
-    })();
-
+    /* CINEMATICS MODULE (this is not ai bruh its just so its more clean) */
     const cinematicModule = (function () {
 
         let hidden = false;
@@ -1578,20 +1749,21 @@
             const savedData = JSON.parse(localStorage.getItem(storageKey)) || {};
             const savedSettings = savedData['Cinematic Mode']?.settings || {};
             return {
-                key: (savedSettings.cinematic_key || "H").toLowerCase()
+                key: (savedSettings.cinematic_key || "K").toLowerCase()
             };
         };
 
         function toggleGameOpacity() {
+
             if (hud && window.getComputedStyle(hud).display !== "none") {
                 if (!GameUi) return;
-
-                hidden = !hidden;
-
-                GameUi.style.transition = "opacity 0.2s ease";
-                GameUi.style.opacity = hidden ? "0" : "1";
-                hud.style.transition = "opacity 0.2s ease";
-                hud.style.opacity = hidden ? "0" : "1";
+                if (OffReplayViewer) {
+                    hidden = !hidden;
+                    GameUi.style.transition = "opacity 0.2s ease";
+                    GameUi.style.opacity = hidden ? "0" : "1";
+                    hud.style.transition = "opacity 0.2s ease";
+                    hud.style.opacity = hidden ? "0" : "1";
+                }
             };
         }
 
@@ -1625,6 +1797,85 @@
         return {
             start,
             stop
+        };
+
+    })();
+    /* NAMETAGS MODULE (this is not ai bruh its just so its more clean) */
+    const nametagsModule = (function () {
+        let originalGetContext = null;
+        let bgImage = new Image();
+        let hookedContexts = new WeakSet();
+
+        const getSettings = () => {
+            const savedData = JSON.parse(localStorage.getItem(storageKey)) || {};
+            const savedSettings = savedData['Nametags']?.settings || {};
+            return { image: savedSettings.nametag_style || 'https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/Nametags/nebula.webp' };
+        };
+
+        const loadImage = () => {
+            const settings = getSettings();
+            bgImage = new Image();
+            bgImage.crossOrigin = "anonymous";
+            bgImage.src = settings.image;
+        };
+
+        function hookCanvas(ctx) {
+            if (ctx._hooked) return;
+            ctx._hooked = true;
+
+            const originalFillText = ctx.fillText;
+            ctx.fillText = function (text, x, y, maxWidth) {
+                const isInsideNametagBox =
+                      x >= 0 && x <= 800 &&
+                      y >= 30 && y <= 300;
+
+                if (ApplyNametags && text === username && isInsideNametagBox) {
+                    this.save();
+                    originalFillText.call(this, text, x, y, maxWidth);
+                    ApplyNametags = false;
+                    const originalFillRect = ctx.fillRect;
+
+                    ctx.fillRect = function(x,y,w,h){
+                        const NameTagBox =
+                              w > 100 && w < 700 &&
+                              h === 69 ||h === 52 &&
+                              y === 0 || y === 69 || y === 70 || y === 139 ;
+
+                        if (NameTagBox && bgImage.complete) {
+                            const pattern = this.createPattern(bgImage, "repeat");
+                            this.fillStyle = pattern;
+                        }
+                        originalFillRect.call(this,x,y,w,h);
+                    }
+                } else { originalFillText.call(this, text, x, y, maxWidth); }
+            };
+        }
+
+        const injectHook = () => {
+            if (originalGetContext) return;
+            originalGetContext = HTMLCanvasElement.prototype.getContext;
+            HTMLCanvasElement.prototype.getContext = function(type, ...args) {
+                const ctx = originalGetContext.call(this, type, ...args );
+                if (type === '2d' && ctx) { hookCanvas(ctx); }
+                return ctx;
+            };
+        };
+
+        const removeHook = () => {
+            if (!originalGetContext) return;
+            HTMLCanvasElement.prototype.getContext = originalGetContext;
+            originalGetContext = null;
+            hookedContexts = new WeakSet();
+        };
+
+        const start = () => { loadImage(); injectHook(); ApplyNametags = true; };
+        const stop = () => { removeHook(); ApplyNametags = false; };
+        const updateImage = () => { loadImage(); };
+
+        return {
+            start,
+            stop,
+            updateImage
         };
 
     })();
