@@ -1,0 +1,38 @@
+# PERSONAL USE LICENSE
+
+**Copyright © [YEAR] [YOUR NAME/USERNAME]**
+
+Permission is granted to any person who obtains a copy of this software and its source code to:
+
+* use the software for personal, non-commercial purposes;
+* view and inspect the source code;
+* modify the source code for their own personal use;
+* create private modified versions of the software.
+
+## Restrictions
+
+Without prior written permission from the copyright holder, you **may not**:
+
+* redistribute, publish, upload, or share the original source code;
+* redistribute, publish, upload, or share modified versions of the source code;
+* distribute compiled, executable, or otherwise packaged versions of the software;
+* sell, sublicense, or otherwise transfer the software or modified versions to another person;
+* make the software or any modified version publicly available, including through public repositories, websites, file-sharing services, or similar platforms.
+
+Modified versions are permitted **only for private personal use** and may not be distributed or made publicly available.
+
+## Copyright
+
+All rights not expressly granted by this license are reserved by the copyright holder.
+
+This license does not transfer ownership or copyright of the software to any other person.
+
+## No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. THE COPYRIGHT HOLDER IS NOT LIABLE FOR ANY DAMAGES OR LOSS ARISING FROM THE USE OF THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+
+## Permission Requests
+
+Requests for permission to redistribute or otherwise use the software outside the rights granted by this license should be directed to:
+
+**[YOUR CONTACT INFORMATION]**
