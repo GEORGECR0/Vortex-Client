@@ -1,6 +1,6 @@
 # PERSONAL USE LICENSE
 
-**Copyright © [YEAR] [YOUR NAME/USERNAME]**
+**Copyright © 2026 GEORGECR**
 
 Permission is granted to any person who obtains a copy of this software and its source code to:
 
@@ -35,4 +35,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Requests for permission to redistribute or otherwise use the software outside the rights granted by this license should be directed to:
 
-**[YOUR CONTACT INFORMATION]**
+vortex.client629@gmail.com
