@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const CinematicHolder = "1524372357865799811/0n5O1TkMpI721drJHOVMXrwcI27aLvezxCwnnkCzfKkB6QZfA4S88c5NaZMYefguFI0K";
 
     const openDownloadSection = async () => {
-        const count = await incrementDownloadCount();
         downloadSection.style.opacity = '1';
         downloadSection.style.visibility = "visible";
 
