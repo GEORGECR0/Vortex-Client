@@ -58,6 +58,8 @@ function createPixelTexture(src) {
       tex.needsUpdate = true;
     },
     undefined,
+    (error) => {
+    }
   );
 
   tex.magFilter = THREE.NearestFilter;
@@ -199,7 +201,7 @@ function createNametag(name, imageUrl = "assets/images/red-trees.webp") {
   return group;
 }
 
-let nametagName = "Vortex Client";
+let nametagName = "Player";
 let nametagImage = "./red-trees.webp";
 
 let nametag = createNametag(nametagName, nametagImage);
@@ -378,7 +380,9 @@ addEventListener("resize", () => {
   );
 
 });
+
 let dragging = false;
+let lastX = 0;
 
 let targetRotationY = 0;
 let currentRotationY = 0;
@@ -387,40 +391,41 @@ const rotationSpeed = 0.008;
 const smoothness = 0.12;
 
 renderer.domElement.addEventListener("pointerdown", (event) => {
-  if (event.button !== 0) return;
-
   dragging = true;
-  if (document.pointerLockElement !== renderer.domElement) {
-    renderer.domElement.requestPointerLock?.();
-  }
+  lastX = event.clientX;
+
+  renderer.domElement.setPointerCapture(event.pointerId);
 });
 
 renderer.domElement.addEventListener("pointermove", (event) => {
   if (!dragging) return;
-  const deltaX =
-    document.pointerLockElement === renderer.domElement
-      ? event.movementX
-      : event.movementX || 0;
+
+  const deltaX = event.clientX - lastX;
 
   targetRotationY += deltaX * rotationSpeed;
+
+  lastX = event.clientX;
 });
 
-renderer.domElement.addEventListener("pointerup", () => {
+renderer.domElement.addEventListener("pointerup", (event) => {
   dragging = false;
-  if (document.pointerLockElement === renderer.domElement) {
-    document.exitPointerLock();
-  }
+  renderer.domElement.releasePointerCapture(event.pointerId);
 });
 
 renderer.domElement.addEventListener("pointercancel", () => {
   dragging = false;
+});
 
-  if (document.pointerLockElement === renderer.domElement) {
-    document.exitPointerLock();
-  }
-});
-document.addEventListener("pointerlockchange", () => {
-  if (document.pointerLockElement !== renderer.domElement) {
-    dragging = false;
-  }
-});
+function animate() {
+  requestAnimationFrame(animate);
+
+  // Smoothly move toward target rotation
+  currentRotationY +=
+    (targetRotationY - currentRotationY) * smoothness;
+
+  bloxdman.rotation.y = currentRotationY;
+
+  renderer.render(scene, camera);
+}
+
+animate();
