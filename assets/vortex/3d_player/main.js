@@ -204,7 +204,7 @@ function createNametag(name, imageUrl = "assets/images/red-trees.webp") {
 }
 
 let nametagName = "Player";
-let nametagImage = "./red-trees.webp";
+let nametagImage = "red-trees.webp";
 
 let nametag = createNametag(nametagName, nametagImage);
 
