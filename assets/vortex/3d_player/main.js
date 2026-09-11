@@ -96,7 +96,7 @@ function setCharacterImage(imageUrl) {
 }
 
 
-setCharacterImage("./assets/images/Bob.png");
+setCharacterImage("./Bob.png");
 
 
 function setUVs(g, faces, w = 64, h = 64) {
@@ -204,7 +204,7 @@ function createNametag(name, imageUrl = "assets/images/red-trees.webp") {
 }
 
 let nametagName = "Player";
-let nametagImage = "assets/images/red-trees.webp";
+let nametagImage = "./red-trees.webp";
 
 let nametag = createNametag(nametagName, nametagImage);
 
