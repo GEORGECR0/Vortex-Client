@@ -55,10 +55,12 @@ function createPixelTexture(src) {
   const tex = loader.load(
     src,
     () => {
+      console.log("Skin loaded:", src);
       tex.needsUpdate = true;
     },
     undefined,
     (error) => {
+      console.error("SKIN FAILED TO LOAD:", src, error);
     }
   );
 
