@@ -55,13 +55,9 @@ function createPixelTexture(src) {
   const tex = loader.load(
     src,
     () => {
-      console.log("Skin loaded:", src);
       tex.needsUpdate = true;
     },
     undefined,
-    (error) => {
-      console.error("SKIN FAILED TO LOAD:", src, error);
-    }
   );
 
   tex.magFilter = THREE.NearestFilter;
@@ -203,8 +199,8 @@ function createNametag(name, imageUrl = "assets/images/red-trees.webp") {
   return group;
 }
 
-let nametagName = "Player";
-let nametagImage = "red-trees.webp";
+let nametagName = "Vortex Client";
+let nametagImage = "./red-trees.webp";
 
 let nametag = createNametag(nametagName, nametagImage);
 
@@ -382,9 +378,7 @@ addEventListener("resize", () => {
   );
 
 });
-
 let dragging = false;
-let lastX = 0;
 
 let targetRotationY = 0;
 let currentRotationY = 0;
@@ -393,41 +387,40 @@ const rotationSpeed = 0.008;
 const smoothness = 0.12;
 
 renderer.domElement.addEventListener("pointerdown", (event) => {
-  dragging = true;
-  lastX = event.clientX;
+  if (event.button !== 0) return;
 
-  renderer.domElement.setPointerCapture(event.pointerId);
+  dragging = true;
+  if (document.pointerLockElement !== renderer.domElement) {
+    renderer.domElement.requestPointerLock?.();
+  }
 });
 
 renderer.domElement.addEventListener("pointermove", (event) => {
   if (!dragging) return;
-
-  const deltaX = event.clientX - lastX;
+  const deltaX =
+    document.pointerLockElement === renderer.domElement
+      ? event.movementX
+      : event.movementX || 0;
 
   targetRotationY += deltaX * rotationSpeed;
-
-  lastX = event.clientX;
 });
 
-renderer.domElement.addEventListener("pointerup", (event) => {
+renderer.domElement.addEventListener("pointerup", () => {
   dragging = false;
-  renderer.domElement.releasePointerCapture(event.pointerId);
+  if (document.pointerLockElement === renderer.domElement) {
+    document.exitPointerLock();
+  }
 });
 
 renderer.domElement.addEventListener("pointercancel", () => {
   dragging = false;
+
+  if (document.pointerLockElement === renderer.domElement) {
+    document.exitPointerLock();
+  }
 });
-
-function animate() {
-  requestAnimationFrame(animate);
-
-  // Smoothly move toward target rotation
-  currentRotationY +=
-    (targetRotationY - currentRotationY) * smoothness;
-
-  bloxdman.rotation.y = currentRotationY;
-
-  renderer.render(scene, camera);
-}
-
-animate();
+document.addEventListener("pointerlockchange", () => {
+  if (document.pointerLockElement !== renderer.domElement) {
+    dragging = false;
+  }
+});
