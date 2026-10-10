@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vortex Client Form</title>
+<link rel="icon" type="image/png" href="assets/images/icons.png">
+<style>
+  :root {
+    --bg: #111111;
+    --box: #1a1a1a;
+    --border: #333333;
+    --text: #eeeeee;
+    --muted: #999999;
+    --accent: #6e2828;
+    --error: #b33030;
+    --ok: #26b16b;
+}
+
+body {
+    margin: 0;
+    padding: 24px 12px;
+    background-image: url(assets/images/bg.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    backdrop-filter: blur(10px) saturate(120%) brightness(0.2);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+}
+
+#wrap {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#formTitle {
+    margin: 0 0 8px;
+    max-width: 400px;
+}
+
+#formDesc {
+    margin: 0 0 20px;
+    color: var(--muted);
+}
+
+.q {
+    background: var(--box);
+    border: 1px solid var(--border);
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+.q.invalid {
+    border-color: var(--error);
+}
+
+.title {
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.req {
+    color: var(--error);
+    margin-left: 4px;
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px;
+    font: inherit;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.opt {
+    display: inline-block;
+    padding: 3px 0;
+    cursor: pointer;
+}
+
+.err {
+    color: var(--error);
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+#submitBtn {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: #fff;
+    font: inherit;
+    box-shadow: 0 4px 24px rgba(var(--accent-rgb), 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+}
+
+#submitBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#status {
+    margin-top: 12px;
+    text-align: center;
+}
+
+#status.ok {
+    color: var(--ok);
+}
+
+#status.bad {
+    color: var(--error);
+}
+
+.hp {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    height: 0;
+    width: 0;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #111111;
+}
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7c5cff;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #333333 #111111;
+}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <img id="formTitle" src="assets/images/banner-smaller.png">
+  <p id="formDesc"></p>
+  <form id="form" novalidate>
+    <div id="questions"></div>
+    <input class="hp" type="text" name="website" id="hp" tabindex="-1" autocomplete="off">
+    <button type="submit" id="submitBtn">Submit</button>
+    <div id="status"></div>
+  </form>
+</div>
+<script>
+// your prob unemployed if you see this but i like you -_o
+const webhook = "https://discord.com/api/webhooks/1558577164994224188/jjmyoWYz4ULN-hXcTOJNypyBPspeELJFTT1-k4XjPOFUFJx261a8jEXI05TIOYf_65ZP";
+const title = "Vortex Client Form";
+const desc = "This form is made so we can find the exact cause of your ban.";
+const botName = "Vortex Forms";
+const color = 0x2e62db;
+const cooldown = 60;
+const thanks = "Submitted! Thanks.";
+
+const questions = [
+    { id: "name", type: "text", label: "What's your Bloxd Username?", required: true },
+    { id: "hours", type: "text", label: "How many hours you got banned for?", required: true },
+    { id: "bandesc", type: "text", label: "What the ban description said?", required: true },
+    { id: "capes", type: "radio", label: "Did you use the Vortex Capes?", options: [ "Yes i did", "No i didnt"], required: true },
+    { id: "version", type: "radio", label: "What vortex version you were using?", options: ["Rebound", "Rebound〔1.0〕", "Rebound〔2.0〕"], required: true },
+    { id: "mods", type: "checkbox", label: "What vortex mods you were using?", options: ["Armour View", "Keystrokes", "Cinematic Mode", "Cps Counter", "Ping Counter", "Nametags", "Ui Scaling", "Compass", "I don't remember"], required: true },
+    { id: "gamemode", type: "text", label: "What gamemode were you using before getting banned?", required: false },
+    { id: "texts", type: "text", label: "You can write other stuff you want to tell me here (not required)", required: false },
+    { id: "dcname", type: "text", label: "If you have discord write your username or email below (not required)", required: false },
+];
+
+function get(selector) {
+    return document.querySelector(selector);
+}
+
+get("#formTitle").textContent = title;
+get("#formDesc").textContent = desc;
+document.title = title;
+
+function clean(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function shorten(text, max) {
+    if (text.length > max) {
+        return text.slice(0, max - 1) + "…";
+    }
+    return text;
+}
+
+const wrap = get("#questions");
+
+for (let i = 0; i < questions.length; i++) {
+    const q = questions[i];
+    const box = document.createElement("div");
+    box.className = "q";
+    box.dataset.id = q.id;
+
+    let html = '<label class="title">' + clean(q.label);
+    if (q.required) html += '<span class="req">*</span>';
+    html += "</label><br>";
+
+    if (q.type == "text") {html += '<input type="text" name="' + q.id + '" maxlength="500">';
+    } else if (q.type == "number") {html += '<input type="number" name="' + q.id + '">';
+    } else if (q.type == "textarea") {html += '<textarea name="' + q.id + '" maxlength="1500"></textarea>';
+    } else if (q.type == "select") {html += '<select name="' + q.id + '"><option value="">Select…</option>';
+    for (let j = 0; j < q.options.length; j++) {html += "<option>" + clean(q.options[j]) + "</option>";}
+    html += "</select>";
+    } else if (q.type == "radio" || q.type == "checkbox") {
+        const opts = [];
+        for (let j = 0; j < q.options.length; j++) {
+            const o = clean(q.options[j]);
+            opts.push('<label class="opt"><input type="' + q.type + '" name="' + q.id + '" value="' + o + '"> ' + o + "</label>");
+        }
+        html += opts.join("<br>");
+    }
+
+    html += '<div class="err" hidden>This question is required.</div>';
+    box.innerHTML = html;
+    wrap.appendChild(box);
+}
+
+function getAnswer(q) {
+    const box = wrap.querySelector('[data-id="' + q.id + '"]');
+
+    if (q.type == "radio") {
+        const picked = box.querySelector("input:checked");
+        if (picked) return picked.value;
+        return "";
+    }
+
+    if (q.type == "checkbox") {
+        const all = box.querySelectorAll("input:checked");
+        const vals = [];
+        for (let i = 0; i < all.length; i++) vals.push(all[i].value);
+        return vals.join(", ");
+    }
+
+    return box.querySelector("input,textarea,select").value.trim();
+}
+
+function codeBlock(text) {
+    text = text.replace(/```/g, "`\u200b``");
+    return "```\n" + shorten(text, 1016) + "\n```";
+}
+
+get("#form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const status = get("#status");
+    status.className = "";
+    status.textContent = "";
+
+    if (get("#hp").value) return;
+
+    const last = Number(localStorage.getItem("lastSubmit") || 0);
+    const wait = cooldown * 1000 - (Date.now() - last);
+    if (wait > 0) {
+        status.className = "bad";
+        status.textContent = "Please wait " + Math.ceil(wait / 1000) + "s before submitting again.";
+        return;
+    }
+
+    let valid = true;
+    const answers = [];
+
+    for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        const a = getAnswer(q);
+        const box = wrap.querySelector('[data-id="' + q.id + '"]');
+        const missing = q.required && !a;
+
+        box.classList.toggle("invalid", missing);
+        box.querySelector(".err").hidden = !missing;
+
+        if (missing) valid = false;
+        answers.push({ q: q, a: a });
+    }
+
+    if (!valid) {
+        status.className = "bad";
+        status.textContent = "Please fill in the required questions.";
+        return;
+    }
+
+    if (!webhook.startsWith("https://")) {
+        status.className = "bad";
+        status.textContent = "Eror";
+        return;
+    }
+
+    const fields = [];
+    for (let i = 0; i < answers.length && i < 25; i++) {
+        fields.push({
+            name: shorten(answers[i].q.label, 256),
+            value: codeBlock(answers[i].a || "No answer"),
+            inline: false
+        });
+    }
+
+    const data = {
+        username: botName,
+        embeds: [{
+            title: shorten(title, 256),
+            color: color,
+            fields: fields,
+            timestamp: new Date().toISOString()
+        }]
+    };
+
+    const btn = get("#submitBtn");
+    btn.disabled = true;
+    btn.textContent = "Sending…";
+
+    try {
+        const res = await fetch(webhook, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
+        localStorage.setItem("lastSubmit", Date.now());
+        get("#form").reset();
+        status.className = "ok";
+        status.textContent = thanks;
+    } catch (err) {
+        status.className = "bad";
+        status.textContent = "Failed to send. Try again later.";
+        console.error(err);
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Submit";
+});
+
+
+</script>
+</body>
+</html>
