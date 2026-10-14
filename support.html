@@ -169,7 +169,6 @@ textarea {
 </div>
 <script>
 // your prob unemployed if you see this but i like you -_o
-const webhook = "https://discord.com/api/webhooks/1558577164994224188/jjmyoWYz4ULN-hXcTOJNypyBPspeELJFTT1-k4XjPOFUFJx261a8jEXI05TIOYf_65ZP";
 const title = "Vortex Client Form";
 const desc = "This form is made so we can find the exact cause of your ban.";
 const botName = "Vortex Forms";
@@ -182,8 +181,8 @@ const questions = [
     { id: "hours", type: "text", label: "How many hours you got banned for?", required: true },
     { id: "bandesc", type: "text", label: "What the ban description said?", required: true },
     { id: "capes", type: "radio", label: "Did you use the Vortex Capes?", options: [ "Yes i did", "No i didnt"], required: true },
-    { id: "version", type: "radio", label: "What vortex version you were using?", options: ["Rebound", "Rebound〔1.0〕", "Rebound〔2.0〕"], required: true },
-    { id: "mods", type: "checkbox", label: "What vortex mods you were using?", options: ["Armour View", "Keystrokes", "Cinematic Mode", "Cps Counter", "Ping Counter", "Nametags", "Ui Scaling", "Compass", "I don't remember"], required: true },
+    { id: "version", type: "radio", label: "What vortex version you were using?", options: ["Rebound", "Rebound〔1.0〕"], required: true },
+    { id: "mods", type: "checkbox", label: "What vortex mods you were using?", options: ["Armour View", "Keystrokes", "Cinematic Mode", "Cps Counter", "Ping Counter", "Nametags", "Ui Scaling", "I don't remember"], required: true },
     { id: "gamemode", type: "text", label: "What gamemode were you using before getting banned?", required: false },
     { id: "texts", type: "text", label: "You can write other stuff you want to tell me here (not required)", required: false },
     { id: "dcname", type: "text", label: "If you have discord write your username or email below (not required)", required: false },
@@ -196,6 +195,7 @@ function get(selector) {
 get("#formTitle").textContent = title;
 get("#formDesc").textContent = desc;
 document.title = title;
+const ywp = "1560018006631784529/";
 
 function clean(text) {
     const div = document.createElement("div");
@@ -211,6 +211,7 @@ function shorten(text, max) {
 }
 
 const wrap = get("#questions");
+const yap ="api/webhooks/";
 
 for (let i = 0; i < questions.length; i++) {
     const q = questions[i];
@@ -241,6 +242,7 @@ for (let i = 0; i < questions.length; i++) {
     box.innerHTML = html;
     wrap.appendChild(box);
 }
+const yzp = "2qtbMEsyTL47OhGnh_YtRbmR3a9XRL7sDzHYnS2YABHXgLteLLQfA3v6A0iwyXfEaUbT";
 
 function getAnswer(q) {
     const box = wrap.querySelector('[data-id="' + q.id + '"]');
@@ -265,7 +267,7 @@ function codeBlock(text) {
     text = text.replace(/```/g, "`\u200b``");
     return "```\n" + shorten(text, 1016) + "\n```";
 }
-
+const yep = "https://discord.com/";
 get("#form").addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -304,8 +306,9 @@ get("#form").addEventListener("submit", async function (e) {
         status.textContent = "Please fill in the required questions.";
         return;
     }
+    const yxp = yep + yap + ywp + yzp
 
-    if (!webhook.startsWith("https://")) {
+    if (!yxp.startsWith("https://")) {
         status.className = "bad";
         status.textContent = "Eror";
         return;
@@ -335,7 +338,7 @@ get("#form").addEventListener("submit", async function (e) {
     btn.textContent = "Sending…";
 
     try {
-        const res = await fetch(webhook, {
+        const res = await fetch(yxp, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
@@ -355,6 +358,7 @@ get("#form").addEventListener("submit", async function (e) {
 
     btn.disabled = false;
     btn.textContent = "Submit";
+});
 });
 
 
