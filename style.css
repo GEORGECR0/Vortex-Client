@@ -625,3 +625,7 @@
       font-weight: lighter;
       font-size: 15px;
   }
+
+#capeDiscontinued{
+  cursor: not-allowed;
+}
