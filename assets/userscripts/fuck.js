@@ -1,7 +1,7 @@
 
-    //if you wanna steal the code just dm me in discord: [ ge0rgecr_ ] if not im gonna find u
+    // This project is licensed under the Personal Use License.
+    // See the full license: [ https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/userscripts/License.txt ]
 
-    /* MODULES (this is not ai bruh its just so its more clean) */
     const modules = {
         'Combat': [
             {
@@ -20,7 +20,8 @@
                 onDisable: () => { armorDisplayModule.stop() },
                 settings: [
                     { id: 'armourview_scale', label: 'Scale', type: 'slider', min: 0.5, max: 2.0, step: 0.1, defaultValue: 1.0 },
-                    { id: 'armourview_orientation', label: 'Orientation', type: 'dropdown', options: ['Horizontal', 'Vertical'], defaultValue: 'Horizontal' }
+                    { id: 'armourview_orientation', label: 'Orientation', type: 'dropdown', options: ['Horizontal', 'Vertical'], defaultValue: 'Horizontal' },
+                    { id: 'armourview_position', label: 'Position', type: 'dropdown', options: ['Hotbar' , 'Bottom Right', 'Bottom Left',], defaultValue: 'Bottom Right' }
                 ]
             },
             {
@@ -34,7 +35,7 @@
                 onDisable: () => { pingModule.stop() }
             },
         ],
-        'Player': [
+        'Utility': [
             {
                 name: 'Cinematic Mode', description: 'Hides your UI for cinematics' , hasSettings: true, enabled: false,
                 onEnable: () => { cinematicModule.start() },
@@ -42,10 +43,7 @@
                 settings: [
                     { id: 'cinematic_key', label: 'Action Key', type: 'input' , defaultValue: 'K' },
                 ]
-            }
-        ],
-
-        'Utility': [
+            },
             {
                 name: 'Ui Scaling', description: 'Change the size of your hud', hasSettings: true, enabled: false,
                 onEnable: () => { UiScaleModule.start() },
@@ -81,8 +79,13 @@
                 ]
             },
         ],
+        'Texture Packs': [
+            {
+                name: 'C_Fault 8x', description: 'Made by: C_Bloxd',
+            },
+        ],
         'Settings': [
-
+            { id: 'vortex_key', label: 'Menu Key', type: 'input' , defaultValue: 'ShiftRight' },
         ]
     };
 
@@ -136,33 +139,38 @@
 
     const Notification = document.createElement('div');
     Notification.style.position = 'fixed';
-    Notification.style.top = '5px';
-    Notification.style.right = '5px';
-    Notification.style.backdropFilter = 'blur(14px)';
-    Notification.style.backgroundColor = 'rgba(10, 12, 16, 0.7)';
-    Notification.style.borderRadius = '0.8rem';
-    Notification.style.width = 'fit-content';
-    Notification.style.height = 'fit-content';
-    Notification.style.padding = '20px';
-    Notification.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1)';
-    Notification.style.border = '1px solid rgba(255, 255, 255, 0.07)';
+    Notification.style.top = '20px';
+    Notification.style.right = '20px';
+    Notification.style.backdropFilter = 'grayscale(80%) brightness(0.6) blur(10px)';
+    Notification.style.backgroundColor = "rgba(10,12,16,0.8)";
+    Notification.style.borderRadius = "0.6rem";
+    Notification.style.width = 'auto';
+    Notification.style.height = '55px';
+    Notification.style.padding = '0px 10px 0px';
+    Notification.style.border = '1px solid rgba(255, 255, 255, 0.09)';
     Notification.style.display = 'none';
     Notification.style.opacity = '0';
     Notification.style.zIndex = '9999';
     Notification.style.color = 'white';
-    Notification.style.textAlign = "center";
+    Notification.style.alignItems = "center";
+    Notification.style.boxSizing = "border-box";
+    Notification.style.justifyContent = "center";
     Notification.style.pointerEvents = 'none';
     Notification.style.transition = 'all 0.5s ease';
     ClientHud.appendChild(Notification);
 
-    /* GET CANVAS CONTENT FUNCTIONS username and coords (this is not ai bruh its just so its more clean) */
+    /* GET CANVAS CONTENT FUNCTIONS username (this is not ai bruh its just so its more clean) */
     let BlxdLogo = "https://raw.githubusercontent.com/GEORGECR0/Vortex-Client/main/assets/vortex/blxd_logo.png";
-    let username = null;
     let OffReplayViewer = true;
     let NameDisplay = null;
-    let usernameNoti = true;
     let ApplyNametags = false;
     let ApplyUiScaling = false;
+
+    let usernameNoti = true;
+    let username = null;
+
+    let coords = [];
+    let coordsEnabled = false;
 
     const originalGetContext = HTMLCanvasElement.prototype.getContext;
     HTMLCanvasElement.prototype.getContext = function (...args) {
@@ -176,6 +184,15 @@
                 if (!isNumber && username === null) {
                     username = str;
                 }
+                if (coordsEnabled) {
+                    if (/^-?\d+\.\d+$/.test(str)) {
+                        coords.push(Number(str));
+                        if (coords.length > 3) {
+                            coords.shift();
+                        }
+                    }
+                }
+
                 return originalFillText.call(this, text, x, y, ...rest);
             };
         }
@@ -198,13 +215,12 @@
             ClientHud.style.display = 'block';
             OffReplayViewer = true;
             if (usernameNoti && username !== null) {
-                NameDisplay.innerHTML =
-                    `<img style=" border-radius: 5px ; aspect-ratio: 1; height: 60%; image-rendering: pixelated; margin-right: 7px; border: 2px solid transparent; outline: 1px solid rgba(255,255,255,0.09);" src="${BlxdLogo}">${username}`;
+                NameDisplay.innerHTML = `<img style=" border-radius: 5px ; aspect-ratio: 1; height: 60%; image-rendering: pixelated; margin-right: 7px; border: 2px solid transparent; outline: 1px solid rgba(255,255,255,0.09);" src="${BlxdLogo}">${username}`;
                 usernameNoti = false;
                 setTimeout(() => {
-                    Notification.style.display = 'block';
+                    Notification.style.display = 'flex';
                     Notification.style.opacity = '1';
-                    Notification.innerHTML = `Welcome to Vortex Client <span style="color: rgba(190, 90, 95, 1); font-weight: bolder;">${username}</span> !!!`;
+                    Notification.innerHTML = `Welcome to Vortex Client &nbsp;<span style="color: #b82833; font-weight: 800 ; text-shadow: 0 0 15px #7c363b; font-weight: bolder;">${username}</span>`;
                     setTimeout(() => {
                         Notification.style.opacity = '0';
                         setTimeout(() => {
@@ -221,11 +237,10 @@
             ClientHud.style.display = 'none';
             document.title = "Bloxd.io - Vortex Client";
             if (username == null) {
-                const menunamedisplay = document.querySelector(".PlayerNamePreview")?.textContent.trim();
+                const menunamedisplay = document.querySelector(".ProfilePreviewName")?.textContent.trim();
                 if (!menunamedisplay) return;
                 username = menunamedisplay;
-                NameDisplay.innerHTML =
-                    `<img style=" border-radius: 5px ; aspect-ratio: 1; height: 60%; image-rendering: pixelated; margin-right: 7px; border: 2px solid transparent; outline: 1px solid rgba(255,255,255,0.09);" src="${BlxdLogo}">${username}`;
+                NameDisplay.innerHTML = `<img style=" border-radius: 5px ; aspect-ratio: 1; height: 60%; image-rendering: pixelated; margin-right: 7px; border: 2px solid transparent; outline: 1px solid rgba(255,255,255,0.09);" src="${BlxdLogo}">${username}`;
             }
 
         }
@@ -383,9 +398,9 @@
     const tabs = [
         { name: 'Combat', icon: 'ri-sword-fill' },
         { name: 'Visual', icon: 'ri-eye-fill', },
-        { name: 'Player', icon: 'ri-walk-fill', },
         { name: 'Utility', icon: 'ri-tools-fill', },
-        { name: 'Cosmetics', icon: 'ri-magic-fill', }
+        { name: 'Cosmetics', icon: 'ri-magic-fill', },
+        { name: 'Texture Packs', icon: 'ri-folder-3-fill', }
     ];
 
     const tabButtons = [];
@@ -463,12 +478,13 @@
             fBtn.addEventListener('mouseover', () => { if (!fBtn.classList.contains('active')) {fBtn.style.transition = 'background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1)'; fBtn.style.border = '1px solid rgba(255, 255, 255, 0.1)'; fBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.005)'; fBtn.style.color = 'rgba(255, 255, 255, 0.6)'; } });
             fBtn.addEventListener('mouseout', () => { if (!fBtn.classList.contains('active')) { fBtn.style.backgroundColor = 'transparent'; fBtn.style.color = 'rgba(255, 255, 255, 0.35)'; fBtn.style.border = 'none'; } });
             fBtn.addEventListener('click', () => {
-                setContent('Settings (none)');
                 tabButtons.forEach(btn => { btn.classList.remove('active'); btn.style.backgroundColor = 'transparent'; btn.style.border = 'none'; btn.style.boxShadow = 'none'; btn.style.color = 'rgba(255, 255, 255, 0.35)'; });
+                showSettingsPanel({ name: 'Settings', settings: modules['Settings'], global: true });
             });
         }
         tabBar.appendChild(fBtn);
     });
+
 
     function createModuleCard(moduleName, iconClass, descriptionText, hasSettings = false, isEnabled = false) {
         const card = document.createElement('div');
@@ -482,6 +498,81 @@
         card.style.display = 'flex';
         card.style.flexDirection = 'column';
         card.style.justifyContent = 'space-between';
+
+        if (moduleName === "C_Fault 8x") {
+            card.style.flexDirection = 'row';
+            card.style.alignItems = 'center';
+            card.style.justifyContent = 'flex-start';
+            card.style.textAlign = 'left';
+            card.style.padding = '10px';
+            card.style.maxHeight = '80px';
+            card.style.gap = '12px';
+            card.style.width = '280px';
+            card.style.boxSizing = 'border-box';
+
+            const img = document.createElement('img');
+            img.src = 'https://raw.githubusercontent.com/GEORGECR0/Vortex_Preview_Testing/main/tpack-icon.png';
+            img.alt = moduleName;
+            img.style.width = '60px';
+            img.style.height = '60px';
+            img.style.minWidth = '60px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '8px';
+            card.appendChild(img);
+            const textWrap = document.createElement('div');
+            textWrap.style.flex = '1';
+            textWrap.style.minWidth = '0';
+            textWrap.style.overflow = 'hidden';
+            const title = document.createElement('div');
+            title.textContent = moduleName;
+            title.style.fontSize = '16px';
+            title.style.fontWeight = 'bold';
+            title.style.color = 'white';
+            title.style.whiteSpace = 'nowrap';
+            textWrap.appendChild(title);
+
+            const description = document.createElement('div');
+            description.textContent = descriptionText;
+            description.style.fontSize = '12px';
+            description.style.color = 'rgba(255, 255, 255, 0.6)';
+            description.style.marginTop = '4px';
+            description.style.display = '-webkit-box';
+            description.style.webkitLineClamp = '2';
+            description.style.webkitBoxOrient = 'vertical';
+            textWrap.appendChild(description);
+
+            card.appendChild(textWrap);
+            const dlBtn = document.createElement('button');
+            dlBtn.innerHTML = '<i class="ri-download-fill"></i>';
+            dlBtn.style.width = '50px';
+            dlBtn.style.height = '50px';
+            dlBtn.style.minWidth = '50px';
+            dlBtn.style.border = 'none';
+            dlBtn.style.borderRadius = '8px';
+            dlBtn.style.cursor = 'pointer';
+            dlBtn.style.backgroundColor = 'rgba(110, 40, 40, 0.8)';
+            dlBtn.style.color = 'white';
+            dlBtn.style.fontSize = '22px';
+            dlBtn.style.display = 'flex';
+            dlBtn.style.alignItems = 'center';
+            dlBtn.style.justifyContent = 'center';
+            dlBtn.style.marginLeft = 'auto';
+            dlBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.open("https://georgecr0.github.io/Vortex-Client/#download", "_blank");
+            });
+            card.appendChild(dlBtn);
+
+            card.addEventListener('mouseover', () => {
+                card.style.transform = 'translateY(-4px) scale(1.02)';
+            });
+            card.addEventListener('mouseout', () => {
+                card.style.transform = 'translateY(0) scale(1)';
+            });
+
+            return card;
+        }
+
         const textWrapper = document.createElement('div');
         const name = document.createElement('div');
         name.textContent = moduleName;
@@ -550,6 +641,7 @@
         slider.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
         slider.style.transition = '.4s';
         slider.style.borderRadius = '34px';
+        slider.style.boxShadow = 'none';
         switchLabel.appendChild(slider);
         const sliderKnob = document.createElement('span');
         sliderKnob.style.position = 'absolute';
@@ -565,15 +657,18 @@
         if (isEnabled) {
             switchInput.checked = true;
             slider.style.backgroundColor = 'rgba(110, 40, 40, 0.8)';
+            slider.style.boxShadow = '0px 0px 15px -3px rgb(110, 40, 40)';
             sliderKnob.style.transform = 'translateX(26px)';
         }
         switchInput.addEventListener('change', () => {
             const isChecked = switchInput.checked;
             if (isChecked) {
                 slider.style.backgroundColor = 'rgba(110, 40, 40, 0.8)';
+                slider.style.boxShadow = '0px 0px 11px -3px rgb(110, 40, 40)';
                 sliderKnob.style.transform = 'translateX(26px)';
             } else {
                 slider.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                slider.style.boxShadow = 'none';
                 sliderKnob.style.transform = 'translateX(0)';
             }
             let savedStates = JSON.parse(localStorage.getItem(storageKey)) || {};
@@ -643,32 +738,33 @@
         headerContainer.style.width = '100%';
         headerContainer.style.marginBottom = '20px';
         contentArea.appendChild(headerContainer);
+        if (!module.global) {
+            const backButton = document.createElement('button');
+            backButton.innerHTML = `<i class="ri-arrow-left-line"></i>`;
+            backButton.style.fontSize = '20px';
+            backButton.style.color = 'white';
+            backButton.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            backButton.style.border = '1px solid rgba(255, 255, 255, 0.15)';
+            backButton.style.borderRadius = '8px';
+            backButton.style.width = '40px';
+            backButton.style.height = '40px';
+            backButton.style.cursor = 'pointer';
+            backButton.style.marginRight = '15px';
+            backButton.style.transition = 'background-color 0.3s ease';
+            backButton.style.display = 'flex';
+            backButton.style.alignItems = 'center';
+            backButton.style.justifyContent = 'center';
+            backButton.addEventListener('mouseover', () => { backButton.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; });
+            backButton.addEventListener('mouseout', () => { backButton.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'; });
+            backButton.addEventListener('click', () => { setContent(currentTabName); });
+            headerContainer.appendChild(backButton);
 
-        const backButton = document.createElement('button');
-        backButton.innerHTML = `<i class="ri-arrow-left-line"></i>`;
-        backButton.style.fontSize = '20px';
-        backButton.style.color = 'white';
-        backButton.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-        backButton.style.border = '1px solid rgba(255, 255, 255, 0.15)';
-        backButton.style.borderRadius = '8px';
-        backButton.style.width = '40px';
-        backButton.style.height = '40px';
-        backButton.style.cursor = 'pointer';
-        backButton.style.marginRight = '15px';
-        backButton.style.transition = 'background-color 0.3s ease';
-        backButton.style.display = 'flex';
-        backButton.style.alignItems = 'center';
-        backButton.style.justifyContent = 'center';
-        backButton.addEventListener('mouseover', () => { backButton.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; });
-        backButton.addEventListener('mouseout', () => { backButton.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'; });
-        backButton.addEventListener('click', () => { setContent(currentTabName); });
-        headerContainer.appendChild(backButton);
-
-        const title = document.createElement('div');
-        title.textContent = `${module.name} Settings`;
-        title.style.fontSize = '22px';
-        title.style.fontWeight = 'bold';
-        headerContainer.appendChild(title);
+            const title = document.createElement('div');
+            title.textContent = `${module.name} Settings`;
+            title.style.fontSize = '22px';
+            title.style.fontWeight = 'bold';
+            headerContainer.appendChild(title);
+        }
 
         const settingsContentArea = document.createElement('div');
         settingsContentArea.style.width = '100%';
@@ -795,8 +891,12 @@
                         const option = document.createElement('option');
                         option.value = opt;
                         option.textContent = opt;
+                        option.style.backgroundColor = '#050608';
+                        option.style.color = '#fff';
                         select.appendChild(option);
                     });
+                    select.onfocus = () => {select.style.borderRadius = '5px 5px 0px 0px'; select.style.border = '1px solid rgba(255,255,255,0.4)';};
+                    select.onblur = () => {select.style.borderRadius = '5px'; select.style.border = '1px solid rgba(255,255,255,0.1)';};
                     select.value = value;
                     select.addEventListener('change', () => {
                         saveSetting(module.name, setting.id, select.value);
@@ -806,19 +906,24 @@
                 }
                 case 'input': {
                     const textInput = document.createElement('input');
-                    textInput.type = 'input';
-                    textInput.placeholder = setting.placeholder;
-                    textInput.value = value;
-                    textInput.maxLength = 1;
-                    textInput.style.backgroundColor = 'rgba(0,0,0,0.3)';
-                    textInput.style.color = 'white';
-                    textInput.style.border = '1px solid rgba(255,255,255,0.1)';
-                    textInput.style.borderRadius = '5px';
-                    textInput.style.padding = '8px';
-                    textInput.style.textAlign = 'center';
-                    textInput.addEventListener('change', () => {
-                        saveSetting(module.name, setting.id, textInput.value);
+                    textInput.type = 'text';
+                    textInput.placeholder = 'Press a key';
+                    textInput.value = value || '';
+                    textInput.readOnly = true;
+                    Object.assign(textInput.style, {backgroundColor: 'rgba(0,0,0,0.3)',color: 'white',border: '1px solid rgba(255,255,255,0.1)',borderRadius: '5px',padding: '8px',maxWidth: '100px',textAlign: 'center',cursor: 'pointer'});
+                    textInput.addEventListener('focus', () => {textInput.value = 'Press a key';});
+                    textInput.addEventListener('keydown', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        const key = event.code;
+                        textInput.value = key;
+                        saveSetting(module.name, setting.id, key);
+                        textInput.blur();
+                        textInput.style.border = '1px solid rgba(255,255,255,0.1)';
+                        KeyDisplay.innerHTML = `<div style="font-family: inherit;font-weight: bold; color: #fff;padding: 2px 8px;border-radius: 6px;background: rgba(110, 40, 40, 0.7);border: 1px solid rgba(255, 255, 255, 0.12);box-shadow: 0 0 10px -2px rgba(184, 40, 51, 0.7);";>${getClientSettings().key}</div>open / close menu`;
+
                     });
+
                     settingWrapper.appendChild(textInput);
                     break;
                 }
@@ -894,6 +999,11 @@
         tabLabel.style.color = 'white';
         tabLabel.style.textShadow = '0 0 10px rgba(255, 255, 255, 0.2)';
         tabLabel.style.transition = 'all 0.4s ease-in-out';
+        if (tabName !== 'Texture Packs') {
+            tabLabel.textContent = tabName;
+        } else {
+            tabLabel.textContent = 'Vortex Partners';
+        }
         contentArea.appendChild(tabLabel);
         const gridContainer = document.createElement('div');
         gridContainer.style.width = '100%';
@@ -928,8 +1038,8 @@
         btn.style.boxShadow = 'none';
         btn.style.fontSize = options.fontSize || '20px';
         btn.style.color = 'white';
-        btn.style.transition = 'box-shadow 0.3s ease';
-        btn.addEventListener('mouseover', function () { btn.style.transition = 'background-image 0.3s ease, box-shadow 0.3s ease'; btn.style.backgroundImage = 'linear-gradient(45deg, rgba(110, 40, 40, 1) 40%, rgba(124, 54, 59, 1) 100%)'; btn.style.boxShadow = '0px 0px 15px -4px rgb(110, 40, 40)'; });
+        btn.style.transition = 'box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        btn.addEventListener('mouseover', function () { btn.style.backgroundImage = 'linear-gradient(45deg, rgba(110, 40, 40, 1) 40%, rgba(124, 54, 59, 1) 100%)'; btn.style.boxShadow = '0px 0px 15px -4px rgb(110, 40, 40)'; });
         btn.addEventListener('mouseout', function () { btn.style.transition = 'none'; btn.style.backgroundImage = 'linear-gradient(45deg, rgba(0, 4, 9, 1) 40%, rgba(14, 14, 19, 1) 100%)'; btn.style.boxShadow = 'none'; });
         if (options.text) btn.textContent = options.text;
         if (options.html) btn.innerHTML = options.html;
@@ -958,11 +1068,18 @@
     VortexMenuBtnDiv.style.gap = '10px';
     menu.appendChild(VortexMenuBtnDiv);
 
-    const icons = ['ri-pencil-fill', 'ri-group-fill', 'ri-magic-fill', 'ri-settings-5-fill'];
+    const icons = ['ri-settings-5-fill', 'ri-group-fill', 'ri-magic-fill', 'ri-discord-fill'];
+
     icons.forEach(icon => {
         const btn = createStyledButton({ html: `<i class="${icon}"></i>` });
         VortexMenuBtnDiv.appendChild(btn);
-        btn.addEventListener('click', function () { mainMenuCon.style.display = 'flex'; menu.style.display = 'none'; gameui.style.display = ''; });
+
+        btn.addEventListener('click', function () {
+            if (icon === 'ri-discord-fill') { window.open('https://discord.gg/M6RTaEGPrY', '_blank'); return; }
+            mainMenuCon.style.display = 'flex';
+            menu.style.display = 'none';
+            gameui.style.display = '';
+        });
     });
 
     const MenuTopBar = document.createElement("div");
@@ -1032,11 +1149,16 @@
         });
         setTimeout(updateTime, 60000 - (now.getSeconds() * 1000));
     }
-
     updateTime();
 
+    function getClientSettings() {
+        const VortexSettings = (JSON.parse(localStorage.getItem(storageKey)) || {})['Settings']?.settings || {};
+        return {
+            key: (VortexSettings.vortex_key || "ShiftRight")
+        };
+    }
+
     let menuVisible = true;
-    const toggleMenuKey = 'ShiftRight';
     const BlxdPointerLock = Element.prototype.requestPointerLock;
 
     Element.prototype.requestPointerLock = function (...args) {
@@ -1056,7 +1178,7 @@
     }
 
     window.addEventListener("keydown", function (e) {
-        if (e.code === toggleMenuKey) {
+        if (e.code === getClientSettings().key) {
             menuVisible = !menuVisible;
             if(menuVisible) { document.exitPointerLock(); }
             updateMenu();
@@ -1073,27 +1195,16 @@
     setTimeout(initializeModules, 2000);
 
     const sound = new Audio("https://github.com/GEORGECR0/Vortex-Client/raw/main/assets/vortex/Vortex%20Click%20Sound%20Effect.mp3");
-
     sound.preload = "auto";
     sound.volume = 0.5;
-
     function playClickSound() {
         sound.currentTime = 0;
         sound.play().catch(() => {});
     }
-
     document.addEventListener("click", (event) => {
         const element = event.target.closest( "button, input, select, textarea, [role='combobox']");
         if (!element) return;
         playClickSound();
-    }, true);
-
-    document.addEventListener("input", (event) => {
-        if ( event.target.matches("input[type='range'], input[type='checkbox'], input[type='radio']") ) { playClickSound();}
-    }, true);
-
-    document.addEventListener("change", (event) => {
-        if (event.target.matches("select")) {playClickSound();}
     }, true);
 
     /* CPS COUNTER MODULE (this is not ai bruh its just so its more clean) */
@@ -1207,10 +1318,7 @@
             rightClicks = 0;
         };
 
-        return {
-            start,
-            stop
-        };
+        return {start, stop};
     })();
 
     /* PING COUNTER MODULE (this is not ai bruh its just so its more clean) */
@@ -1333,19 +1441,16 @@
             ping = 0;
         };
 
-        return {
-            start,
-            stop
-        };
+        return {start, stop};
     })();
 
     /* ARMOUR VIEW  MODULE (this is not ai bruh its just so its more clean) */
     const armorDisplayModule = (function() {
-        const ARMOR_IMG_URL = 'https://i.postimg.cc/5t7RH0NN/Untitledyjffggggg.png';
-        const ARMOR_INDEXES = [46, 47, 48, 49, 50];
-        let displayBox = null;
-        let overrideStyleSheet = null;
-        let updateIntervalId = null;
+        const armoridx = [46, 47, 48, 49, 50];
+        let observer = null;
+        let ArmourView = null;
+        let updateSlot = false;
+        let HotbarPos = null;
 
         const setStyles = (element, styles) => {
             Object.assign(element.style, styles);
@@ -1356,108 +1461,92 @@
             const savedSettings = savedData['Armour View']?.settings || {};
             return {
                 scale: savedSettings.armourview_scale !== undefined ? savedSettings.armourview_scale : 1.0,
-                orientation: savedSettings.armourview_orientation || 'Horizontal'
+                orientation: savedSettings.armourview_orientation || 'Horizontal',
+                position: savedSettings.armourview_position || 'Bottom Right'
             };
-        };
-
-        const injectOverrideCSS = () => {
-            if (overrideStyleSheet) return;
-            overrideStyleSheet = document.createElement('style');
-            overrideStyleSheet.innerHTML = `
-                .InvenItem.inven-item-clone {
-                    background: none !important;
-                    background-color: transparent !important;
-                    border: none !important;
-                    outline: none !important;
-                    background-image: none !important;
-                }
-            `;
-            document.head.appendChild(overrideStyleSheet);
-        };
-
-        const createDisplayBox = () => {
-            displayBox = document.createElement('div');
-            const initialStyles = {
-                position: 'fixed', zIndex: '1', display: 'flex', padding: '5px',
-                backgroundColor: 'transparent', pointerEvents: 'none'
-            };
-
-            Object.assign(initialStyles, {
-                bottom: '20px',
-                right: '20px',
-                transformOrigin: 'bottom right'
-            });
-
-            setStyles(displayBox, initialStyles);
-            ClientHud.appendChild(displayBox);
         };
 
         const applyStylesFromSettings = () => {
-            if (!displayBox) return;
+            if (!ArmourView) return;
             const settings = getSettings();
+            const scale = settings.scale;
 
-            if (settings.orientation === 'Horizontal') {
-                setStyles(displayBox, { flexDirection: 'row', width: 'auto', height: '60px', alignItems: 'center' });
-            } else {
-                setStyles(displayBox, { flexDirection: 'column', width: '60px', height: 'auto', alignItems: 'center' });
+            if (settings.position === 'Bottom Right') {
+                setStyles(ArmourView, { bottom: '20px' , right: '20px' ,});
+
+                if (settings.orientation === 'Horizontal') {
+                    setStyles(ArmourView, { flexDirection: 'row', width: 'auto', height: '60px' });
+                } else {
+                    setStyles(ArmourView, { flexDirection: 'column', width: '60px', height: 'auto' });
+                }
+
+            } else if (settings.position === 'Bottom Left') {
+                setStyles(ArmourView, { bottom: '5px' , right: `${window.innerWidth - 5 - (ArmourView.offsetWidth * scale)}px`});
+
+                if (settings.orientation === 'Horizontal') {
+                    setStyles(ArmourView, { flexDirection: 'row', width: 'auto', height: '60px' });
+                } else {
+                    setStyles(ArmourView, { flexDirection: 'column', width: '60px', height: 'auto' });
+                }
+
+            }else if (HotbarPos) {
+                setStyles(ArmourView, { flexDirection: 'row', width: 'auto', height: '60px' , bottom: `${window.innerHeight - (HotbarPos.bottom + 5)}px`, right: `${window.innerWidth - HotbarPos.left - (ArmourView.offsetWidth * scale)}px` });
             }
-            displayBox.style.transform = `scale(${settings.scale})`;
+
+            ArmourView.style.transform = `scale(${scale})`;
         };
 
         const updateItems = () => {
-            if (!displayBox) return;
+            if (!ArmourView) return;
+            observer.disconnect();
+            const Hotbar = document.querySelector('.BottomScreenStatBarList');
+            if (Hotbar) { HotbarPos = Hotbar.getBoundingClientRect(); }
+            ArmourView.replaceChildren();
+            for (const idx of armoridx) {
+                const invenArmour = document.querySelector(`.InvenItem[data-inven-idx="${idx}"]`);
+                if (!invenArmour) continue;
+                const imageHolder = invenArmour.querySelector('.TwoDImageIcon');
+                if (!imageHolder) continue;
+                const armourSlot = imageHolder.cloneNode(true);
+                armourSlot.style.width = '60px';
+                armourSlot.style.height = '60px';
+                armourSlot.style.imageRendering = 'pixelated';
+                ArmourView.appendChild(armourSlot);
+            }
             applyStylesFromSettings();
-            displayBox.querySelectorAll('.inven-item-clone').forEach(item => item.remove());
-            ARMOR_INDEXES.forEach(idx => {
-                const originalItem = document.querySelector(`.InvenItem[data-inven-idx="${idx}"]`);
-                if (!originalItem) return;
-                const clone = originalItem.cloneNode(true);
-                clone.className = 'InvenItem inven-item-clone';
-                /*    clone.style.filter = `
-        drop-shadow(3px 0 0 black)
-        drop-shadow(-3px 0 0 black)
-        drop-shadow(0 3px 0 black)
-        drop-shadow(0 -3px 0 black)
-    `; */
-                clone.removeAttribute('id');
-                setStyles(clone, {backgroundColor: 'transparent', border: 'none', marginBottom: '-7px', transform: 'scale(1.0)' });
-                const unfilledSlot = clone.querySelector('.InvenItemUnfilled');
-                if (unfilledSlot) {
-                    unfilledSlot.style.backgroundImage = `url("${ARMOR_IMG_URL}")`;
-                }
-                displayBox.appendChild(clone);
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
             });
         };
 
         const start = () => {
-            if (displayBox) return;
-            injectOverrideCSS();
-            createDisplayBox();
+            if (ArmourView) return;
+            ArmourView = document.createElement('div');
+            ArmourView.style.position = 'fixed';
+            ArmourView.style.display = 'flex';
+            ArmourView.style.alignItems = 'center';
+            ArmourView.style.zIndex = '999999';
+            ArmourView.style.transformOrigin = 'right bottom ';
+            ClientHud.appendChild(ArmourView);
+
+            observer = new MutationObserver(() => {
+                updateItems();
+            });
             updateItems();
-            updateIntervalId = setInterval(updateItems, 500);
+
         };
 
         const stop = () => {
-            clearInterval(updateIntervalId);
-            updateIntervalId = null;
-            if (displayBox) {
-                displayBox.remove();
-                displayBox = null;
-            }
-            if (overrideStyleSheet) {
-                overrideStyleSheet.remove();
-                overrideStyleSheet = null;
-            }
+            if (observer) { observer.disconnect(); observer = null; }
+            if (ArmourView) {ArmourView.remove();ArmourView = null;}
         };
 
-        return {
-            start,
-            stop,
-        };
+        return {start, stop};
     })();
 
+    /* UI SCALING MODULE (this is not ai bruh its just so its more clean) */
     const UiScaleModule = (function() {
-        let updateIntervalId = null;
         let observer = null;
 
         const getSettings = () => {
@@ -1535,16 +1624,16 @@
             ApplyUiScaling = false;
 
             if (observer) { observer.disconnect(); observer = null; }
+
+            document.querySelectorAll('.InGameHeaderContainer, .BottomMiddleElements, .BottomRightElements, .TopLeftElements, .TopRightElements, .BottomLeftElements, .RightInfoDivContainer, #pingDisplay, #cpsDisplay ').forEach(reset => {
+                if (!reset) return;
+                reset.style.transform = 'scale(1.0)';
+            });
         };
         const updateScale = () => { SetScale(); ApplyUiScaling = true; };
 
-        return {
-            start,
-            stop,
-            updateScale
-        };
+        return {start, stop, updateScale };
     })();
-
 
     /* KEYSTROKES MODULE (this is not ai bruh its just so its more clean) */
     const keystrokesModule = (function () {
@@ -1576,7 +1665,10 @@
             const key = keyElements[name];
             if (!key) return;
 
-            key.style.background = pressed ? "rgba(169, 45, 54, 0.6)": "rgba(0,0,0,0.6)";
+            key.style.background = pressed ? "rgba(255, 255, 255, 0.4)": "rgba(0,0,0,0.6)";
+            key.style.color = pressed ? "#000000": "#fff";
+            key.style.fontSize = pressed ? "21px": "20px";
+            key.style.fontWeight = pressed ? "600": "500";
         };
 
         const start = () => {
@@ -1589,7 +1681,6 @@
             keystrokesHud.style.flexDirection = "column";
             keystrokesHud.style.gap = "4px";
             keystrokesHud.style.transform = 'scale(1.0)';
-            keystrokesHud.style.zIndex = "1";
             keystrokesHud.style.pointerEvents = "none";
 
             const row1 = document.createElement("div");
@@ -1617,7 +1708,7 @@
             row3.style.display = "flex";
             row3.style.justifyContent = "center";
 
-            keyElements.Space = createKey("───", 188, 30);
+            keyElements.Space = createKey("────", 188, 30);
             row3.appendChild(keyElements.Space);
 
             const row4 = document.createElement("div");
@@ -1716,10 +1807,7 @@
             keyElements = {};
         };
 
-        return {
-            start,
-            stop
-        };
+        return {start,stop};
     })();
 
     /* CINEMATICS MODULE (this is not ai bruh its just so its more clean) */
@@ -1780,10 +1868,7 @@
             if (hud) hud.style.opacity = "1";
         };
 
-        return {
-            start,
-            stop
-        };
+        return {start, stop};
 
     })();
     /* NAMETAGS MODULE (this is not ai bruh its just so its more clean) */
@@ -1858,10 +1943,5 @@
         const stop = () => { removeHook(); ApplyNametags = false; };
         const updateImage = () => { loadImage(); };
 
-        return {
-            start,
-            stop,
-            updateImage
-        };
-
+        return {start, stop, updateImage};
     })();
