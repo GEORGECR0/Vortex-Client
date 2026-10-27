@@ -1,18 +1,4 @@
-// ==UserScript==
-// @name         Vortex Client
-// @namespace    http://tampermonkey.net/
-// @version      Rebound〔1.0〕
-// @description  Vortex Client is a project to make Bloxd fun again...
-// @author       GEORGECR
-// @homepageURL  https://georgecr0.github.io/Vortex-Client/
-// @icon         https://i.postimg.cc/fRpcmPqN/Vortex-Logo.png
-// @match        https://bloxd.io/*
-// @run-at       document-idle
-// @grant        none
-// ==/UserScript==
 
-(function () {
-    'use strict';
     //if you wanna steal the code just dm me in discord: [ ge0rgecr_ ] if not im gonna find u
 
     /* MODULES (this is not ai bruh its just so its more clean) */
@@ -1879,4 +1865,3 @@
         };
 
     })();
-})();
